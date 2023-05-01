@@ -1,1 +1,1 @@
-export const t = '';
+export * from './mongoose.repository';

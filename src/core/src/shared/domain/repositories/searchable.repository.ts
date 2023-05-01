@@ -1,3 +1,4 @@
+import { FilterQuery } from 'mongoose';
 import {
   Entity,
   FilterParams,
@@ -6,11 +7,17 @@ import {
 } from '../../domain';
 
 export interface RepositoryInterface<Props, E extends Entity<Props>> {
-  insert(entity: E): Promise<void>;
+  insert(entity: E): Promise<E>;
+  insertMany(entities: E[]): Promise<E[]>;
   findById(id: string | UniqueEntityId): Promise<E>;
+  findByField(field: keyof Props, value: unknown): Promise<E>;
   findAll(): Promise<E[]>;
-  update(entity: E): Promise<void>;
+  search(props: SearchParams): Promise<SearchResult<Props, E>>;
+  update(entity: E): Promise<E>;
   delete(id: string | UniqueEntityId): Promise<void>;
+  activate(id: string): Promise<void>;
+  inactivate(id: string): Promise<void>;
+  softDelete(id: string): Promise<void>;
 }
 
 export type SortDirection = 'asc' | 'desc';
@@ -255,18 +262,6 @@ export class SearchWithoutPaginationResult<E extends Entity<E>> {
       items: forceEntity ? this.items.map((item) => item.toJSON()) : this.items,
     };
   }
-}
-
-export interface SearchableRepositoryInterface<
-  Props,
-  E extends Entity<Props>,
-  SearchInput = SearchParams,
-  SearchOutput = SearchResult<Props, E>,
-> extends RepositoryInterface<Props, E> {
-  sortableFields: string[];
-  searchableFields: string[];
-  filterableFields: string[];
-  search(props: SearchInput): Promise<SearchOutput>;
 }
 
 export type SearchByIdAndUserIdInputDto = {

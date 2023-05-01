@@ -1,11 +1,11 @@
-import { FilterParams, FilterOperators } from '../../domain';
+import { FilterParams, FilterOperators } from '../../../domain';
 
-import { Entity } from '../entities';
+import { Entity } from '../../entities';
 import {
   ParseFilterInMemory,
   ParseFilterOperatorsInMemory,
 } from './parse-filter-in-memory';
-import { SearchParams } from './searchable.repository';
+import { SearchParams } from '../searchable.repository';
 
 interface ApplyFilterDefaultSearch {
   defaultSearch: FilterParams[];

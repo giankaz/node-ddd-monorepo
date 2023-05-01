@@ -113,7 +113,7 @@ export abstract class Entity<Props> {
 
   public isInactive = () => this.status === CommonStatus.INACTIVE;
 
-  toJSON(): Required<{ id: string } & Props> {
+  toJSON(): Required<CommonEntityProps & Props> {
     const data = {};
     for (const key of Object.keys(this.props || {})) {
       if (this.props[key] instanceof ValueObject) {
@@ -146,6 +146,6 @@ export abstract class Entity<Props> {
         id: this.id,
         ...data,
       }),
-    ) as Required<{ id: string } & Props>;
+    ) as Required<CommonEntityProps & Props>;
   }
 }

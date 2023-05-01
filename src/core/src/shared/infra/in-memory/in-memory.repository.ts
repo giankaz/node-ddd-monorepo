@@ -4,7 +4,6 @@ import {
   NotFoundError,
   UniqueEntityId,
   RepositoryInterface,
-  SearchableRepositoryInterface,
   SearchParams,
   SearchResult,
   SortDirection,
@@ -14,55 +13,6 @@ export abstract class InMemoryRepository<Props, E extends Entity<Props>>
   implements RepositoryInterface<Props, E>
 {
   items: E[] = [];
-
-  async insert(entity: E): Promise<void> {
-    this.items.push(entity);
-  }
-
-  async insertMany(entities: E[]): Promise<void> {
-    this.items = [...this.items, ...entities];
-  }
-
-  async findById(id: string | UniqueEntityId): Promise<E> {
-    const _id = `${id}`;
-    return this._get(_id);
-  }
-
-  async findAll(): Promise<E[]> {
-    return this.items;
-  }
-
-  async update(entity: E): Promise<void> {
-    await this._get(entity.id);
-    const indexFound = this.items.findIndex((i) => i.id === entity.id);
-    this.items[indexFound] = entity;
-  }
-
-  async delete(id: string | UniqueEntityId): Promise<void> {
-    const _id = `${id}`;
-    await this._get(_id);
-    const indexFound = this.items.findIndex((i) => i.id === _id);
-    this.items.splice(indexFound, 1);
-  }
-
-  protected async _get(id: string): Promise<E> {
-    const item = this.items.find((i) => i.id === id);
-    if (!item) {
-      throw new NotFoundError(
-        NoEntityErrorStandardization.not_found.ABSTRACT_ENTITY_NOT_FOUND,
-      );
-    }
-    return item;
-  }
-}
-
-export abstract class InMemorySearchableRepository<
-    Props,
-    E extends Entity<Props>,
-  >
-  extends InMemoryRepository<Props, E>
-  implements SearchableRepositoryInterface<Props, E>
-{
   abstract sortableFields: string[];
   abstract searchableFields: string[];
   abstract filterableFields: string[];
@@ -133,5 +83,70 @@ export abstract class InMemorySearchableRepository<
     const start = (page - 1) * per_page; // 1 * 15 = 15
     const limit = start + per_page; // 15 + 15 = 30
     return items.slice(start, limit);
+  }
+
+  async insert(entity: E): Promise<E> {
+    this.items.push(entity);
+    return entity;
+  }
+
+  async insertMany(entities: E[]): Promise<E[]> {
+    this.items = [...this.items, ...entities];
+    return entities;
+  }
+
+  async findById(id: string | UniqueEntityId): Promise<E> {
+    const _id = `${id}`;
+    return this._get(_id);
+  }
+
+  async findByField(field: keyof Props, value: unknown): Promise<E> {
+    return this.items.find((item) => item.toJSON()[field] === value);
+  }
+
+  async findAll(): Promise<E[]> {
+    return this.items;
+  }
+
+  async update(entity: E): Promise<E> {
+    await this._get(entity.id);
+    const indexFound = this.items.findIndex((i) => i.id === entity.id);
+    this.items[indexFound] = entity;
+    return entity;
+  }
+
+  async delete(id: string | UniqueEntityId): Promise<void> {
+    const _id = `${id}`;
+    await this._get(_id);
+    const indexFound = this.items.findIndex((i) => i.id === _id);
+    this.items.splice(indexFound, 1);
+  }
+
+  async activate(id: string): Promise<void> {
+    const _id = `${id}`;
+    const entity = await this._get(_id);
+    entity.activate();
+  }
+
+  async inactivate(id: string): Promise<void> {
+    const _id = `${id}`;
+    const entity = await this._get(_id);
+    entity.inactivate();
+  }
+
+  async softDelete(id: string): Promise<void> {
+    const _id = `${id}`;
+    const entity = await this._get(_id);
+    entity.softDelete();
+  }
+
+  protected async _get(id: string): Promise<E> {
+    const item = this.items.find((i) => i.id === id);
+    if (!item) {
+      throw new NotFoundError(
+        NoEntityErrorStandardization.not_found.ABSTRACT_ENTITY_NOT_FOUND,
+      );
+    }
+    return item;
   }
 }

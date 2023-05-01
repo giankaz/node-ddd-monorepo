@@ -1,6 +1,6 @@
-import { FilterParams, FilterOperators } from '../../domain';
+import { FilterParams, FilterOperators } from '../../../domain';
 
-import { ParseFilterInterface } from './parse-filter';
+import { ParseFilterInterface } from '../parse-filter';
 
 export class ParseFilterInMemory
   implements
