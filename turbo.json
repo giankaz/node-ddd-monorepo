@@ -3,12 +3,19 @@
   "globalDependencies": ["**/.env.*local"],
   "pipeline": {
     "build": {
-      "outputs": [".next/**", "!.next/cache/**"]
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
     },
+    "test": {},
+    "format": {},
     "lint": {},
+    "clear:turbo": {},
     "dev": {
+      "dependsOn": ["build"],
       "cache": false,
       "persistent": true
-    }
+    },
+    "core#cti": {},
+    "core#build": {}
   }
 }

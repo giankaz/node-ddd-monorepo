@@ -14,7 +14,19 @@
     "noUnusedParameters": false,
     "preserveWatchOutput": true,
     "skipLibCheck": true,
-    "strict": true
+    "strict": true,
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "incremental": true,
+    "module": "commonjs",
+    "noFallthroughCasesInSwitch": false,
+    "noImplicitAny": false,
+    "removeComments": true,
+    "strictBindCallApply": false,
+    "strictNullChecks": false,
+    "target": "es2017"
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "**/*.spec.ts", "__test__"]
 }

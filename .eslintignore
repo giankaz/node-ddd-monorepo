@@ -1,0 +1,11 @@
+*.gql
+*.hbs
+*.html
+*.js
+*.md
+*.proto
+Dockerfile
+dist/
+env.example
+test/
+*.json
