@@ -19,7 +19,7 @@ namespace MockUseCase {
     ): Promise<Output> {
       if (input.isThrow)
         throw new CoreError({
-          msg: languages[options.language].sent,
+          message: languages[options.language].sent,
           solution: languages[options.language].sent,
         });
       return {
@@ -48,6 +48,22 @@ describe('UseCase Unit Tests', () => {
 
     expect(async () => {
       await useCase.execute(mockInput);
-    }).rejects.toThrowError(new Error('123123'));
+    }).rejects.toThrowError(
+      new CoreError({
+        message: languages.en.sent,
+        solution: languages.en.sent,
+      }),
+    );
+
+    expect(async () => {
+      await useCase.execute(mockInput, {
+        language: 'pt',
+      });
+    }).rejects.toThrowError(
+      new CoreError({
+        message: languages.pt.sent,
+        solution: languages.pt.sent,
+      }),
+    );
   });
 });

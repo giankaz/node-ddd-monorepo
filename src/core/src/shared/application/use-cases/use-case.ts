@@ -28,9 +28,14 @@ export abstract class DefaultUseCase<Input, Output> {
         .trim()
         .replace('async', '');
 
+      const message = err?.message || '';
+      const solution = err?.solution || '';
+
       errorLogger({
         context: this.context,
         location,
+        message,
+        solution,
         err,
       });
 

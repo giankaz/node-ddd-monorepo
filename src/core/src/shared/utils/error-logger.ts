@@ -5,18 +5,48 @@ interface IErrorLogger {
   location: string;
   context: string;
   err: unknown;
+  message: string;
+  solution: string;
 }
 
-export function errorLogger({ context, location, err }: IErrorLogger) {
+export function errorLogger({
+  context,
+  location,
+  err,
+  message,
+  solution,
+}: IErrorLogger) {
+  const size = process.stdout.columns;
+
   const dateString = new Date().toLocaleString();
   const msg = `Error: ${context}`;
-  const bars = '*'.repeat(msg.length * 2);
-  const spaces = ' '.repeat(msg.length / 2);
-  const dateSpaces = ' '.repeat((bars.length - dateString.length) / 2);
+  const bars = '*'.repeat(size);
   const ctx = kleur.red(
-    `\n${bars}\n\n${spaces}${msg}${spaces}\n\n${dateSpaces}${dateString}${dateSpaces}\n\n${bars}\n\n${kleur.underline(
-      `Error Location:`,
-    )}\n\n${location}\n\n`,
+    `
+${bars}
+
+${kleur.underline(msg)}
+
+${dateString}
+
+${bars}
+
+${kleur.underline(`Message:`)}
+
+${message}
+
+${kleur.underline(`Solution:`)}
+
+${solution}
+
+
+${kleur.underline(`Error Location:`)}
+    
+${location}
+
+${bars}
+
+`,
   );
   debug(ctx);
   debug(kleur.underline().magenta('StackTrace:\n\n'));

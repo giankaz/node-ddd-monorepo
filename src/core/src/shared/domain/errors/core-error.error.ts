@@ -1,14 +1,13 @@
 interface ErrorData {
   solution: string;
-  msg: string;
+  message: string;
 }
 
 export class CoreError extends Error {
   public solution: string;
-  public msg: string;
 
-  constructor({ msg, solution }: ErrorData) {
-    super(msg);
+  constructor({ message, solution }: ErrorData) {
+    super(message);
 
     this.solution = solution;
   }
