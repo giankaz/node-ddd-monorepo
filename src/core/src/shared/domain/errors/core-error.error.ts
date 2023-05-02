@@ -1,5 +1,5 @@
 interface ErrorData {
-  solution: string;
+  solution?: string;
   message: string;
 }
 
@@ -9,6 +9,6 @@ export class CoreError extends Error {
   constructor({ message, solution }: ErrorData) {
     super(message);
 
-    this.solution = solution;
+    this.solution = solution || '';
   }
 }

@@ -1,4 +1,5 @@
 import {
+  CoreError,
   Entity,
   RepositoryInterface,
   SearchParams,
@@ -140,7 +141,9 @@ export abstract class InMemoryRepository<Props, E extends Entity<Props>>
   protected async _get(id: string): Promise<E> {
     const item = this.items.find((i) => i.id === id);
     if (!item) {
-      throw new Error('');
+      throw new CoreError({
+        message: 'item not found',
+      });
     }
     return item;
   }

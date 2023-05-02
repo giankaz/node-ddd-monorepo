@@ -16,7 +16,7 @@ export function errorLogger({
   message,
   solution,
 }: IErrorLogger) {
-  const size = process.stdout.columns;
+  const size = 60;
 
   const dateString = new Date().toLocaleString();
   const msg = `Error: ${context}`;
@@ -38,7 +38,6 @@ ${message}
 ${kleur.underline(`Solution:`)}
 
 ${solution}
-
 
 ${kleur.underline(`Error Location:`)}
     

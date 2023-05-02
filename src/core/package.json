@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "jest --forceExit",
+    "test": "jest",
     "build": "pnpm clean:dist; pnpm clean:tsinfo; pnpm cti; pnpm tsc -b ./tsconfig.json",
     "clean:dist": "rm -rf ./dist",
     "cti": "cti ./src -b --withoutbackup -w --withoutcomment -i --fileexcludes *.spec.ts",

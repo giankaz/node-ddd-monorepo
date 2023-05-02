@@ -4,6 +4,7 @@ import { errorLogger } from '../../utils';
 
 export interface UseCaseOptions {
   language: AppLanguages;
+  silent?: boolean;
 }
 export abstract class DefaultUseCase<Input, Output> {
   protected abstract useCase(
@@ -17,6 +18,7 @@ export abstract class DefaultUseCase<Input, Output> {
     options?: UseCaseOptions,
   ): Promise<Output> {
     options = {
+      ...options,
       language: options?.language || 'en',
     };
 
@@ -28,16 +30,18 @@ export abstract class DefaultUseCase<Input, Output> {
         .trim()
         .replace('async', '');
 
-      const message = err?.message || '';
-      const solution = err?.solution || '';
+      if (!options.silent) {
+        const message = err?.message || '';
+        const solution = err?.solution || '';
 
-      errorLogger({
-        context: this.context,
-        location,
-        message,
-        solution,
-        err,
-      });
+        errorLogger({
+          context: this.context,
+          location,
+          message,
+          solution,
+          err,
+        });
+      }
 
       throw err;
     }

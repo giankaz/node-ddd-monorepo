@@ -9,8 +9,7 @@
     "gen": "node gen.js; pnpm format",
     "clean:dist": "rm -rf ./dist",
     "clean:tsinfo": "rm -rf ./tsconfig.tsbuildinfo",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\" --loglevel silent",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "format": "prettier --write \"**/*.{ts,tsx,md}\" --loglevel silent"
   },
   "keywords": [],
   "author": "",

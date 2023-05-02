@@ -47,7 +47,10 @@ describe('UseCase Unit Tests', () => {
     const mockInput = { id: 'teste', name: 'teste', isThrow: true };
 
     expect(async () => {
-      await useCase.execute(mockInput);
+      await useCase.execute(mockInput, {
+        silent: true,
+        language: 'en',
+      });
     }).rejects.toThrowError(
       new CoreError({
         message: languages.en.sent,
@@ -58,6 +61,7 @@ describe('UseCase Unit Tests', () => {
     expect(async () => {
       await useCase.execute(mockInput, {
         language: 'pt',
+        silent: true,
       });
     }).rejects.toThrowError(
       new CoreError({

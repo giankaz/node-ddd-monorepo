@@ -1,10 +1,9 @@
 import { IsNumber } from 'class-validator';
 import {
   CommonEntityProps,
+  CoreError,
   Entity,
   FilterInMemory,
-  NoEntityErrorStandardization,
-  NotFoundError,
   SearchParams,
   SortDirection,
 } from '../../../domain';
@@ -75,17 +74,17 @@ describe('InMemoryRepository Tests', () => {
 
   it('should throws error when entity not found', async () => {
     await expect(repository.findById('fake id')).rejects.toThrow(
-      new NotFoundError(
-        NoEntityErrorStandardization.not_found.ABSTRACT_ENTITY_NOT_FOUND,
-      ),
+      new CoreError({
+        message: 'item not found',
+      }),
     );
 
     await expect(
       repository.findById('9366b7dc-2d71-4799-b91c-c64adb205104'),
     ).rejects.toThrow(
-      new NotFoundError(
-        NoEntityErrorStandardization.not_found.ABSTRACT_ENTITY_NOT_FOUND,
-      ),
+      new CoreError({
+        message: 'item not found',
+      }),
     );
   });
 
@@ -112,9 +111,9 @@ describe('InMemoryRepository Tests', () => {
   it('should throws error on update when entity not found', () => {
     const entity = new StubEntity({ price: 5 }, { name: 'name value' });
     expect(repository.update(entity)).rejects.toThrow(
-      new NotFoundError(
-        NoEntityErrorStandardization.not_found.ABSTRACT_ENTITY_NOT_FOUND,
-      ),
+      new CoreError({
+        message: 'item not found',
+      }),
     );
   });
 
@@ -132,17 +131,17 @@ describe('InMemoryRepository Tests', () => {
 
   it('should throws error on delete when entity not found', () => {
     expect(repository.delete('fake id')).rejects.toThrow(
-      new NotFoundError(
-        NoEntityErrorStandardization.not_found.ABSTRACT_ENTITY_NOT_FOUND,
-      ),
+      new CoreError({
+        message: 'item not found',
+      }),
     );
 
     expect(
       repository.delete('9366b7dc-2d71-4799-b91c-c64adb205104'),
     ).rejects.toThrow(
-      new NotFoundError(
-        NoEntityErrorStandardization.not_found.ABSTRACT_ENTITY_NOT_FOUND,
-      ),
+      new CoreError({
+        message: 'item not found',
+      }),
     );
   });
 
