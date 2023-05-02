@@ -1,1 +1,1 @@
-export const sada = '';
+export * from './another';

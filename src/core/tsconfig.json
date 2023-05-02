@@ -1,9 +1,39 @@
 {
-  "extends": "../../packages/tsconfig/base.json",
   "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": false,
+    "incremental": true,
+    "module": "commonjs",
+    "noFallthroughCasesInSwitch": false,
+    "noImplicitAny": false,
+    "removeComments": true,
+    "skipLibCheck": true,
+    "strictBindCallApply": false,
+    "strictNullChecks": false,
+    "target": "es2017",
+    "composite": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "outDir": "./dist",
-    "baseUrl": "./src"
+    "rootDir": "./src",
+    "noEmit": false,
+    //debug V
+    "diagnostics": true,
+    "extendedDiagnostics": true,
+    "explainFiles": false,
+    "listEmittedFiles": true,
+    "listFiles": false,
+    "traceResolution": false,
+    "disableReferencedProjectLoad": false,
+    "disableSolutionSearching": false,
+    "noErrorTruncation": true,
+    "preserveWatchOutput": false,
+    "pretty": true
   },
-  "include": ["./src"],
-  "exclude": ["node_modules", "**/*.spec.ts", "__test__"]
+  "include": ["src"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
 }

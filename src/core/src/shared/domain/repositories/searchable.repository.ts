@@ -1,20 +1,14 @@
-import { FilterQuery } from 'mongoose';
-import {
-  Entity,
-  FilterParams,
-  UniqueEntityId,
-  IFilterDateValue,
-} from '../../domain';
+import { Entity, FilterParams, IFilterDateValue } from '../../domain';
 
 export interface RepositoryInterface<Props, E extends Entity<Props>> {
   insert(entity: E): Promise<E>;
   insertMany(entities: E[]): Promise<E[]>;
-  findById(id: string | UniqueEntityId): Promise<E>;
+  findById(id: string): Promise<E>;
   findByField(field: keyof Props, value: unknown): Promise<E>;
   findAll(): Promise<E[]>;
   search(props: SearchParams): Promise<SearchResult<Props, E>>;
   update(entity: E): Promise<E>;
-  delete(id: string | UniqueEntityId): Promise<void>;
+  delete(id: string): Promise<void>;
   activate(id: string): Promise<void>;
   inactivate(id: string): Promise<void>;
   softDelete(id: string): Promise<void>;

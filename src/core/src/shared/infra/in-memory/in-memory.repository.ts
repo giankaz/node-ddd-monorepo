@@ -1,8 +1,5 @@
 import {
   Entity,
-  NoEntityErrorStandardization,
-  NotFoundError,
-  UniqueEntityId,
   RepositoryInterface,
   SearchParams,
   SearchResult,
@@ -95,7 +92,7 @@ export abstract class InMemoryRepository<Props, E extends Entity<Props>>
     return entities;
   }
 
-  async findById(id: string | UniqueEntityId): Promise<E> {
+  async findById(id: string): Promise<E> {
     const _id = `${id}`;
     return this._get(_id);
   }
@@ -115,7 +112,7 @@ export abstract class InMemoryRepository<Props, E extends Entity<Props>>
     return entity;
   }
 
-  async delete(id: string | UniqueEntityId): Promise<void> {
+  async delete(id: string): Promise<void> {
     const _id = `${id}`;
     await this._get(_id);
     const indexFound = this.items.findIndex((i) => i.id === _id);
@@ -143,9 +140,7 @@ export abstract class InMemoryRepository<Props, E extends Entity<Props>>
   protected async _get(id: string): Promise<E> {
     const item = this.items.find((i) => i.id === id);
     if (!item) {
-      throw new NotFoundError(
-        NoEntityErrorStandardization.not_found.ABSTRACT_ENTITY_NOT_FOUND,
-      );
+      throw new Error('');
     }
     return item;
   }

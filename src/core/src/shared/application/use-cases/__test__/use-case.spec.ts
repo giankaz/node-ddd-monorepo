@@ -1,32 +1,31 @@
-import { DefaultUseCase, IDefaultUseCase } from '../';
-
+import { DefaultUseCase, UseCaseOptions } from '../';
+import { languages } from 'translation';
+import { CoreError } from '../../../domain';
 namespace MockUseCase {
   type Input = {
     id: string;
     name: string;
+    isThrow?: boolean;
   };
 
   type Output = Input;
 
-  export class UseCase
-    extends DefaultUseCase<Output>
-    implements IDefaultUseCase<Input, Output>
-  {
-    constructor() {
-      super();
-    }
+  export class UseCase extends DefaultUseCase<Input, Output> {
+    context = 'Mock Use Case';
 
-    public async execute(input: Input, isThrow = false) {
-      return await this.errorHandler({
-        context: 'Mock Use Case Execute Function',
-        executeFunction: async () => {
-          if (isThrow) throw new Error('123123');
-          return {
-            id: input.id,
-            name: input.name,
-          };
-        },
-      });
+    protected async useCase(
+      input: Input,
+      options: UseCaseOptions,
+    ): Promise<Output> {
+      if (input.isThrow)
+        throw new CoreError({
+          msg: languages[options.language].sent,
+          solution: languages[options.language].sent,
+        });
+      return {
+        id: input.id,
+        name: input.name,
+      };
     }
   }
 }
@@ -45,10 +44,10 @@ describe('UseCase Unit Tests', () => {
   });
 
   it('should catch the error', async () => {
-    const mockInput = { id: 'teste', name: 'teste' };
+    const mockInput = { id: 'teste', name: 'teste', isThrow: true };
 
     expect(async () => {
-      await useCase.execute(mockInput, true);
+      await useCase.execute(mockInput);
     }).rejects.toThrowError(new Error('123123'));
   });
 });

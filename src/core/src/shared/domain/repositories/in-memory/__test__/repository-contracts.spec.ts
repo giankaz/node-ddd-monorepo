@@ -4,7 +4,7 @@ import {
   SearchParamsWithoutPagination,
   SearchResult,
   SortDirection,
-} from '../../';
+} from '../../../../domain';
 
 describe('Search Unit Tests', () => {
   describe('SearchParams Unit Tests', () => {

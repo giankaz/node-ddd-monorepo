@@ -53,7 +53,7 @@ describe('Entity Test', () => {
     const fake_id = new UniqueEntityId().value;
     const mockDate = new Date('2000-10-10');
     const mockCommon: CommonEntityProps = {
-      id: new UniqueEntityId(fake_id),
+      id: fake_id,
       name: 'name',
       status: CommonStatus.INACTIVE,
       created_at: mockDate,

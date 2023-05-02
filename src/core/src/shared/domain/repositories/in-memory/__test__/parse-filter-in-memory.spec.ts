@@ -1,8 +1,5 @@
-import { FilterParams, FilterOperators } from '../filter-params';
-import {
-  ParseFilterInMemory,
-  ParseFilterOperatorsInMemory,
-} from '../parse-filter-in-memory';
+import { FilterParams, FilterOperators } from '../../../../domain';
+import { ParseFilterInMemory, ParseFilterOperatorsInMemory } from '../../';
 
 describe('Parse filter in memory test', () => {
   it('should be successful if the operator is CONTAINS', () => {

@@ -2,9 +2,11 @@ import { IsNumber } from 'class-validator';
 import {
   CommonEntityProps,
   Entity,
+  FilterInMemory,
   NoEntityErrorStandardization,
   NotFoundError,
-  UniqueEntityId,
+  SearchParams,
+  SortDirection,
 } from '../../../domain';
 import { InMemoryRepository } from '../in-memory.repository';
 
@@ -33,7 +35,34 @@ class StubEntity extends Entity<StubEntityProps> {
 class StubInMemoryRepository extends InMemoryRepository<
   StubEntityProps,
   StubEntity
-> {}
+> {
+  sortableFields: string[] = ['name', 'created_at'];
+  searchableFields: string[] = ['name'];
+  filterableFields: string[] = ['name'];
+
+  protected async applyFilter(
+    items: StubEntity[],
+    filter: SearchParams,
+  ): Promise<StubEntity[]> {
+    if (!filter) {
+      return items;
+    }
+    return FilterInMemory.parse<StubEntityProps, StubEntity>(items, filter, {
+      searchableFields: this.searchableFields,
+      defaultSearch: [],
+    });
+  }
+
+  protected async applySort(
+    items: StubEntity[],
+    sort: string | null,
+    sort_dir: SortDirection | null,
+  ): Promise<StubEntity[]> {
+    return !sort
+      ? super.applySort(items, 'created_at', 'desc')
+      : super.applySort(items, sort, sort_dir);
+  }
+}
 
 describe('InMemoryRepository Tests', () => {
   let repository: StubInMemoryRepository;
@@ -52,9 +81,7 @@ describe('InMemoryRepository Tests', () => {
     );
 
     await expect(
-      repository.findById(
-        new UniqueEntityId('9366b7dc-2d71-4799-b91c-c64adb205104'),
-      ),
+      repository.findById('9366b7dc-2d71-4799-b91c-c64adb205104'),
     ).rejects.toThrow(
       new NotFoundError(
         NoEntityErrorStandardization.not_found.ABSTRACT_ENTITY_NOT_FOUND,
@@ -69,7 +96,7 @@ describe('InMemoryRepository Tests', () => {
     let entityFound = await repository.findById(entity.id);
     expect(entity.toJSON()).toStrictEqual(entityFound.toJSON());
 
-    entityFound = await repository.findById(entity.uniqueEntityId);
+    entityFound = await repository.findById(entity.id);
     expect(entity.toJSON()).toStrictEqual(entityFound.toJSON());
   });
 
@@ -97,7 +124,7 @@ describe('InMemoryRepository Tests', () => {
 
     const entityUpdated = new StubEntity(
       { price: 1 },
-      { name: 'updated', id: entity.uniqueEntityId },
+      { name: 'updated', id: entity.id },
     );
     await repository.update(entityUpdated);
     expect(entityUpdated.toJSON()).toStrictEqual(repository.items[0].toJSON());
@@ -111,9 +138,7 @@ describe('InMemoryRepository Tests', () => {
     );
 
     expect(
-      repository.delete(
-        new UniqueEntityId('9366b7dc-2d71-4799-b91c-c64adb205104'),
-      ),
+      repository.delete('9366b7dc-2d71-4799-b91c-c64adb205104'),
     ).rejects.toThrow(
       new NotFoundError(
         NoEntityErrorStandardization.not_found.ABSTRACT_ENTITY_NOT_FOUND,
@@ -130,7 +155,7 @@ describe('InMemoryRepository Tests', () => {
 
     await repository.insert(entity);
 
-    await repository.delete(entity.uniqueEntityId);
+    await repository.delete(entity.id);
     expect(repository.items).toHaveLength(0);
   });
 });

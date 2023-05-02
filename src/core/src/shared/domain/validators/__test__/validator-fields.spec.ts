@@ -20,9 +20,17 @@ class StubEntityProps {
   }
 }
 
-class StubEntity extends Entity<StubEntityProps> {
+class StubEntity extends Entity<StubEntityProps> implements StubEntityProps {
   constructor(props: StubEntityProps, commonProps?: CommonEntityProps) {
     super(props, StubEntityProps, commonProps);
+  }
+
+  get stub() {
+    return this.props.stub;
+  }
+
+  get price() {
+    return this.props.price;
   }
 }
 

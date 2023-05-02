@@ -1,1 +1,1 @@
-export const ggg = '';
+export * from './some';

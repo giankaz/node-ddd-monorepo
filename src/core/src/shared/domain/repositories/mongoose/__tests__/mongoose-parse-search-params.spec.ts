@@ -1,6 +1,6 @@
 import {
   FilterParams,
-  FilterTOperator,
+  FilterOperators,
   ParseSearchParams,
   SearchParams,
 } from '../../../../domain';
@@ -12,7 +12,7 @@ describe('Test mongoose Parse search params', () => {
       {
         type: 'string',
         column: 'name',
-        operator: FilterTOperator.CONTAINS,
+        operator: FilterOperators.CONTAINS,
         value: 'test',
       } as FilterParams,
     ];
@@ -41,7 +41,7 @@ describe('Test mongoose Parse search params', () => {
       {
         type: 'boolean',
         column: 'name',
-        operator: FilterTOperator.CONTAINS,
+        operator: FilterOperators.CONTAINS,
         value: 'test',
       } as FilterParams,
     ];
@@ -69,7 +69,7 @@ describe('Test mongoose Parse search params', () => {
       {
         type: 'string',
         column: 'name',
-        operator: FilterTOperator.CONTAINS,
+        operator: FilterOperators.CONTAINS,
         value: 'test',
       } as FilterParams,
     ];

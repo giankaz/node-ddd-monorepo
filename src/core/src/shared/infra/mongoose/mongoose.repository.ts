@@ -1,11 +1,11 @@
 import mongoose, { Connection, FilterQuery } from 'mongoose';
 import {
+  CommonStatus,
   Entity,
   MongooseParseSearchParams,
   RepositoryInterface,
   SearchParams,
   SearchResult,
-  UniqueEntityId,
 } from '../../domain';
 
 interface MongooseRepositoryConstructor<Props> {
@@ -53,7 +53,7 @@ export abstract class MongooseRepository<Props, E extends Entity<Props>>
     return models.map(this.toEntity);
   }
 
-  async findById(id: string | UniqueEntityId): Promise<E> {
+  async findById(id: string): Promise<E> {
     const model = await this.model.findOne({ _id: String(id) }).exec();
 
     return this.toEntity(model);
@@ -82,19 +82,17 @@ export abstract class MongooseRepository<Props, E extends Entity<Props>>
 
     const total = await this.model.countDocuments(parsedParams.find).exec();
 
-    const templates = await this.model
+    const models = await this.model
       .find(parsedParams.find)
       .sort(parsedParams.sort)
       .skip(parsedParams.skip)
       .limit(parsedParams.limit)
       .exec();
 
-    const templatesEntities = templates.map((template) =>
-      this.toEntity(template),
-    );
+    const entities = models.map(this.toEntity);
 
     return new SearchResult({
-      items: templatesEntities,
+      items: entities,
       total: total,
       current_page: props.page,
       per_page: props.per_page,
@@ -113,31 +111,19 @@ export abstract class MongooseRepository<Props, E extends Entity<Props>>
     return this.toEntity(model);
   }
 
-  async delete(id: string | UniqueEntityId): Promise<void> {
+  async delete(id: string): Promise<void> {
     await this.model.findOneAndDelete({ _id: String(id) });
   }
 
   async activate(id: string): Promise<void> {
-    const entity = await this.findById(id);
-
-    entity.activate();
-
-    await this.update(entity);
+    await this.model.findByIdAndUpdate(id, { status: CommonStatus.ACTIVE });
   }
 
   async inactivate(id: string): Promise<void> {
-    const entity = await this.findById(id);
-
-    entity.inactivate();
-
-    await this.update(entity);
+    await this.model.findByIdAndUpdate(id, { status: CommonStatus.INACTIVE });
   }
 
   async softDelete(id: string): Promise<void> {
-    const entity = await this.findById(id);
-
-    entity.softDelete();
-
-    await this.update(entity);
+    await this.model.findByIdAndUpdate(id, { status: CommonStatus.DELETED });
   }
 }
