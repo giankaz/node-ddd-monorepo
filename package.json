@@ -8,11 +8,12 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\" --loglevel silent",
     "core:cti": "turbo run core#cti",
     "core:build": "turbo run core#build",
-    "clear:turbo": "find . -type d -name '.turbo' -print0 | xargs -0 rm -rf"
+    "clear:turbo": "find . -type d -name '.turbo' -print0 | xargs -0 rm -rf",
+    "prepare": "husky install"
   },
   "husky": {
     "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+      "pre-commit": "pnpm test"
     }
   },
   "devDependencies": {
