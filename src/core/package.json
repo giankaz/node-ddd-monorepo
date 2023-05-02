@@ -10,6 +10,7 @@
     "clean:dist": "rm -rf ./dist",
     "cti": "cti ./src -b --withoutbackup -w --withoutcomment -i --fileexcludes *.spec.ts",
     "cti:clean": "cti clean ./src",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "clean:tsinfo": "rm -rf ./tsconfig.tsbuildinfo"
 
   },

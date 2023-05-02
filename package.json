@@ -3,7 +3,7 @@
   "scripts": {
     "build": "turbo run build; pnpm format; pnpm i",
     "dev": "turbo run dev",
-    "lint": "turbo run lint",
+    "lint": "turbo run lint -- --max-warnings=0",
     "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,md}\" --loglevel silent",
     "core:cti": "turbo run core#cti",
@@ -13,7 +13,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "pnpm test"
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-commit": "*"
     }
   },
   "devDependencies": {

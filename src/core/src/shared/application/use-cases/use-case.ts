@@ -1,5 +1,4 @@
 import { AppLanguages } from 'translation';
-import { CoreError } from '../../domain/errors';
 import { errorLogger } from '../../utils';
 
 export interface UseCaseOptions {
