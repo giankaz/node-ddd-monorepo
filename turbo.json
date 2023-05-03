@@ -23,6 +23,8 @@
     "core#cti": {},
     "core#build": {
       "dependsOn": ["translation#build"]
-    }
+    },
+    "core#format": {},
+    "core#test": {}
   }
 }

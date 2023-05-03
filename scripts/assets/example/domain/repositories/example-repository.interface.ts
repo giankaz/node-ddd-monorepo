@@ -1,7 +1,8 @@
 import { Example, ExampleModel } from '..';
 import {
+  FilterParams,
   RepositoryInterface,
-  SearchParams,
+  SearchProps,
   SearchResult,
   SearchWithoutPaginationResult,
 } from '../../../shared';
@@ -10,7 +11,10 @@ import { IExample } from '../../application';
 export namespace ExampleRepositoryInterface {
   export type ExampleFields = {} & keyof IExample;
 
-  export class ExampleSearchParams extends SearchParams<ExampleFields> {}
+  export type ExampleSearchParams = SearchProps<
+    FilterParams<ExampleFields>,
+    ExampleFields
+  >;
 
   export class ExampleSearchResult extends SearchResult<
     ExampleModel,

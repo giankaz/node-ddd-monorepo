@@ -18,5 +18,9 @@ export class ExampleInMemoryRepository
     'created_at',
   ];
   searchableFields: ExampleRepositoryInterface.ExampleFields[] = ['name'];
-  filterableFields: ExampleRepositoryInterface.ExampleFields[] = ['name'];
+  filterableFields: ExampleRepositoryInterface.ExampleFields[] = [
+    'id',
+    'name',
+    'status',
+  ];
 }

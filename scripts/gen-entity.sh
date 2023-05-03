@@ -1,10 +1,30 @@
 #!/bin/bash
 read -p "Enter the entity name: " name
 
+script_path=$(readlink -f "$0")
+current_dir=$(dirname "$script_path")
+
+asset_dir=${current_dir}/assets/example 
+output_dir=${current_dir}/../src/core/src/${name}
+
+if [ -d "$output_dir" ]; then
+  echo "Folder of the entity already exists"
+  read -p "Do you wish to delete the previous folder and create a new entity from scratch? y/n " answer
+
+  if [ "${answer}" == "y" ]; then
+    rm -rf "$output_dir"
+    echo "Excluding existing folder..."
+  else
+    echo "Entity generation stopped."
+    exit 1
+  fi
+
+fi
+
 declare -A props
 
 while true; do
-  read -p "Enter the prop name, if optional put a ? as last characters (or send 'q' to finish): " prop
+  read -p "Enter the prop name, if optional put a ? as last character. Enter 'q' to save and finish): " prop
   if [[ "$prop" == "q" ]]; then
     break
   fi
@@ -12,12 +32,6 @@ while true; do
   read -p "Enter the prop type: " type
   props["$prop"]=$type
 done
-
-script_path=$(readlink -f "$0")
-current_dir=$(dirname "$script_path")
-
-asset_dir=${current_dir}/assets/example 
-output_dir=${current_dir}/../src/core/src/${name}
 
 cp -r ${asset_dir} ${output_dir}
 
@@ -33,6 +47,9 @@ find ${output_dir} -type f -exec sed -i "s/EXAMPLE/${name_upper}/g" {} +
 
 find ${output_dir} -depth -name '*example*' -execdir rename "s/example/${name_lowercase}/" {} \;
 
+echo "Generating entity $name..."
+
+
 for key in "${!props[@]}"
 do
   value=${props[$key]}
@@ -40,6 +57,11 @@ do
 last_char_of_key=${key: -1}
 is_optional=false
 parsedKey="$key"
+
+commonFields=("id" "name" "created_at" "updated_at" "status")
+if grep -q "$parsedKey" <<<"${commonFields[@]}"; then
+  break
+fi
 
 if [[ "$last_char_of_key" == "?" ]]; then
   is_optional=true
@@ -55,13 +77,13 @@ if [[ $is_optional == true ]]; then
 getter="get $parsedKey(): $value { return this.props?.$parsedKey } \n\n"
 fi
 
-changer="change$key_uppercase_first (new$key_uppercase_first: $value): void { this.props.$parsedKey = new$key_uppercase_first \n this.update() } \n\n"
+setter="set $parsedKey (new$key_uppercase_first: $value) { this.props.$parsedKey = new$key_uppercase_first \n this.update() } \n\n"
 
 if [[ $is_optional == true ]]; then
-changer="change$key_uppercase_first (new$key_uppercase_first: $value | null): void { this.props.$parsedKey = new$key_uppercase_first \n this.update() } \n\n"
+setter="set $parsedKey (new$key_uppercase_first: $value | null) { this.props.$parsedKey = new$key_uppercase_first \n this.update() } \n\n"
 fi
 
-find ${output_dir} -type f -exec sed -i "/\/\*getters\*\//a $getter  $changer"  {} \;
+find ${output_dir} -type f -exec sed -i "/\/\*getters\*\//a $getter  $setter"  {} \;
 
 model="@classValidator.Is$value_uppercase_first()\n$key: $value;\n\n"
 
@@ -77,6 +99,10 @@ if [[ "$value" == "string" ]]; then
   randomValue+='`random-${uuid()}`,'
 elif [[ "$value" == "number" ]]; then
   randomValue+="Math.floor(Math.random() * 101),"
+elif [[ "$value" == "string[]" ]]; then
+  randomValue+="[uuid()],"
+elif [[ "$value" == "number[]" ]]; then
+  randomValue+="[1, 2, 3],"
 elif [[ "$value" == "boolean" ]]; then
   randomValue+="Math.random() < 0.5 ? false : true,"
 elif [[ "$value" == "Date" ]]; then
@@ -99,6 +125,18 @@ elif [[ "$value" == "number" ]]; then
   mongoschema="$parsedKey: { type: Number, required: false },"
   else
   mongoschema="$parsedKey: { type: Number, required: true },"
+  fi
+elif [[ "$value" == "string[]" ]]; then
+  if [[ $is_optional == true ]]; then
+  mongoschema="$parsedKey: { type: [String], required: false },"
+  else
+  mongoschema="$parsedKey: { type: [String], required: true },"
+  fi
+elif [[ "$value" == "number[]" ]]; then
+  if [[ $is_optional == true ]]; then
+  mongoschema="$parsedKey: { type: [Number], required: false },"
+  else
+  mongoschema="$parsedKey: { type: [Number], required: true },"
   fi
 elif [[ "$value" == "boolean" ]]; then
   if [[ $is_optional == true ]]; then
@@ -123,8 +161,21 @@ find ${output_dir} -type f -exec sed -i "/\/\*toentityprops\*\//a $toentityprops
 
 done
 
+echo "The files for the entity $name was successfuly created, now the files are being indented by prettier, build, and tested"
+
 find ${output_dir} -type f -exec sed -i "/\/\*getters\*\//d"  {} \;
 find ${output_dir} -type f -exec sed -i "/\/\*models\*\//d"  {} \;
 find ${output_dir} -type f -exec sed -i "/\/\*random\*\//d"  {} \;
 find ${output_dir} -type f -exec sed -i "/\/\*mongoschema\*\//d"  {} \;
 find ${output_dir} -type f -exec sed -i "/\/\*toentityprops\*\//d"  {} \;
+
+cd ${current_dir}/../
+
+pnpm core:build --output-logs=none
+
+cd ${current_dir}/../src/core
+
+pnpm jest --testPathPattern=$name
+
+
+echo "The file generator has stopped it process."

@@ -21,7 +21,11 @@ export class ExampleMongoRepository
     'created_at',
   ];
   searchableFields: ExampleRepositoryInterface.ExampleFields[] = ['name'];
-  filterableFields: ExampleRepositoryInterface.ExampleFields[] = ['id', 'name'];
+  filterableFields: ExampleRepositoryInterface.ExampleFields[] = [
+    'id',
+    'name',
+    'status',
+  ];
 
   constructor(connection?: Connection) {
     super({

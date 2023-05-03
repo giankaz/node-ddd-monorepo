@@ -237,7 +237,7 @@ describe('mongoose repository tests', () => {
 
     const NEW_NAME = 'NEW_NAME';
 
-    entity.changeName(NEW_NAME);
+    entity.name = NEW_NAME;
 
     await repository.update(entity);
 

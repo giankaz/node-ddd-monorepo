@@ -8,8 +8,11 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\" --loglevel silent",
     "core:cti": "turbo run core#cti",
     "core:build": "turbo run core#build",
+    "core:format": "turbo run core#format",
+    "core:test": "turbo run core#test",
     "clear:turbo": "find . -type d -name '.turbo' -print0 | xargs -0 rm -rf",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "gen:entity": "bash ./scripts/gen-entity.sh; echo 'File generator finished. ;)'"
   },
   "husky": {
     "hooks": {

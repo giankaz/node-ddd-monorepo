@@ -1,3 +1,3 @@
-import { Example } from '../../domain';
+import { IExample } from './example.dto';
 
-export type ExampleInput = Pick<Example, 'name' | 'status'>;
+export type ExampleInput = Omit<IExample, 'id'>;

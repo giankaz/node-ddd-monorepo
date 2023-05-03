@@ -6,14 +6,14 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
-    "build": "pnpm clean:dist; pnpm clean:tsinfo; pnpm cti; pnpm tsc -b ./tsconfig.json",
+    "build": "pnpm clean:dist; pnpm clean:tsinfo; pnpm cti; pnpm format; pnpm tsc -b ./tsconfig.json",
     "clean:dist": "rm -rf ./dist",
     "cti": "cti ./src -b --withoutbackup -w --withoutcomment -i --fileexcludes *.spec.ts",
     "cti:clean": "cti clean ./src",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "clean:tsinfo": "rm -rf ./tsconfig.tsbuildinfo",
-    "gen:entity": "bash ../../scripts/gen-entity.sh && pnpm format",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "gen:entity": "bash ../../scripts/gen-entity.sh; echo 'File generator finished. ;)'",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\" --loglevel silent"
   },
   "keywords": [],
   "author": "",
