@@ -13,10 +13,7 @@ namespace MockUseCase {
   export class UseCase extends DefaultUseCase<Input, Output> {
     context = 'Mock Use Case';
 
-    protected async useCase(
-      input: Input,
-      options: UseCaseOptions,
-    ): Promise<Output> {
+    async useCase(input: Input, options: UseCaseOptions): Promise<Output> {
       if (input.isThrow)
         throw new CoreError({
           message: languages[options.language].sent,

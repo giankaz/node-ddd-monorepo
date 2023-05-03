@@ -22,7 +22,7 @@ describe('Update Example UseCase Test', () => {
     await repository.insertMany([example, example2]);
 
     await useCase.execute({
-      ...example2.toJSON(),
+      ...example2.props,
       id: example.id,
     });
 
