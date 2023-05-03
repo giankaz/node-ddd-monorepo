@@ -8,10 +8,10 @@ interface IFilterOperatorReturn {
   [key: string]: unknown;
 }
 
-export class MongooseParseFilter
-  implements ParseFilterInterface<IFilterOperatorReturn>
+export class MongooseParseFilter<Fields extends string>
+  implements ParseFilterInterface<IFilterOperatorReturn, Fields>
 {
-  public parseArray(params: FilterParams[]) {
+  public parseArray<Fields extends string>(params: FilterParams<Fields>[]) {
     const items = params.map(this.parse).reduce((acc, cur) => {
       for (const key in cur) {
         if (!acc[key]) {
@@ -34,16 +34,16 @@ export class MongooseParseFilter
     return items;
   }
 
-  public parse(param: FilterParams) {
+  public parse<Fields extends string>(param: FilterParams<Fields>) {
     if (param.column === 'id') {
-      param.column = '_id';
+      param.column = '_id' as Fields;
     }
 
     switch (param.type) {
       case 'operator':
-        return MongooseParseFilterOperators.parse(param);
+        return MongooseParseFilterOperators.parse<Fields>(param);
       case 'string':
-        return MongooseParseFilterOperators.parseContains(param);
+        return MongooseParseFilterOperators.parseContains<Fields>(param);
       case 'boolean':
         return { [param.column]: !!param.value };
       case 'date':
@@ -55,67 +55,87 @@ export class MongooseParseFilter
           },
         };
     }
-    return MongooseParseFilterOperators.parse(param);
+    return MongooseParseFilterOperators.parse<Fields>(param);
   }
 }
 
 export class MongooseParseFilterOperators {
-  static parseContains(
-    param: Pick<FilterParams, 'column' | 'value'>,
+  static parseContains<Fields extends string>(
+    param: Pick<FilterParams<Fields>, 'column' | 'value'>,
   ): IFilterOperatorReturn {
-    return { [param.column]: new RegExp(`${param.value}`, 'i') };
+    return { [param.column as string]: new RegExp(`${param.value}`, 'i') };
   }
-  static parseNotContains(param: FilterParams): IFilterOperatorReturn {
+  static parseNotContains<Fields extends string>(
+    param: FilterParams<Fields>,
+  ): IFilterOperatorReturn {
     return { [param.column]: { $not: new RegExp(`${param.value}`, 'i') } };
   }
-  static parseEqual(param: FilterParams): IFilterOperatorReturn {
+  static parseEqual<Fields extends string>(
+    param: FilterParams<Fields>,
+  ): IFilterOperatorReturn {
     return { [param.column]: param.value };
   }
-  static parseNotEqual(param: FilterParams): IFilterOperatorReturn {
+  static parseNotEqual<Fields extends string>(
+    param: FilterParams<Fields>,
+  ): IFilterOperatorReturn {
     return { [param.column]: { $ne: param.value } };
   }
-  static parseIsFilled(param: FilterParams): IFilterOperatorReturn {
+  static parseIsFilled<Fields extends string>(
+    param: FilterParams<Fields>,
+  ): IFilterOperatorReturn {
     return { [param.column]: { $ne: null } };
   }
-  static parseNotFilled(param: FilterParams): IFilterOperatorReturn {
+  static parseNotFilled<Fields extends string>(
+    param: FilterParams<Fields>,
+  ): IFilterOperatorReturn {
     return { [param.column]: null };
   }
-  static parseHad(param: FilterParams): IFilterOperatorReturn {
+  static parseHad<Fields extends string>(
+    param: FilterParams<Fields>,
+  ): IFilterOperatorReturn {
     return { [param.column]: { $gt: 0 } };
   }
-  static parseNotHad(param: FilterParams): IFilterOperatorReturn {
+  static parseNotHad<Fields extends string>(
+    param: FilterParams<Fields>,
+  ): IFilterOperatorReturn {
     return { [param.column]: 0 };
   }
-  static parseIsGreaterThan(param: FilterParams): IFilterOperatorReturn {
+  static parseIsGreaterThan<Fields extends string>(
+    param: FilterParams<Fields>,
+  ): IFilterOperatorReturn {
     return { [param.column]: { $gt: param.value } };
   }
 
-  static parseIsLessThan(param: FilterParams): IFilterOperatorReturn {
+  static parseIsLessThan<Fields extends string>(
+    param: FilterParams<Fields>,
+  ): IFilterOperatorReturn {
     return { [param.column]: { $lt: param.value } };
   }
 
-  public static parse(param: FilterParams): IFilterOperatorReturn {
+  public static parse<Fields extends string>(
+    param: FilterParams<Fields>,
+  ): IFilterOperatorReturn {
     switch (param.operator) {
       case FilterOperators.CONTAINS:
-        return this.parseContains(param);
+        return this.parseContains<Fields>(param);
       case FilterOperators.NOT_CONTAINS:
-        return this.parseNotContains(param);
+        return this.parseNotContains<Fields>(param);
       case FilterOperators.EQUAL:
-        return this.parseEqual(param);
+        return this.parseEqual<Fields>(param);
       case FilterOperators.NOT_EQUAL:
-        return this.parseNotEqual(param);
+        return this.parseNotEqual<Fields>(param);
       case FilterOperators.HAD:
-        return this.parseHad(param);
+        return this.parseHad<Fields>(param);
       case FilterOperators.NOT_HAD:
-        return this.parseNotHad(param);
+        return this.parseNotHad<Fields>(param);
       case FilterOperators.IS_FILLED:
-        return this.parseIsFilled(param);
+        return this.parseIsFilled<Fields>(param);
       case FilterOperators.IS_NOT_FILLED:
-        return this.parseNotFilled(param);
+        return this.parseNotFilled<Fields>(param);
       case FilterOperators.IS_GREATER_THAN:
-        return this.parseIsGreaterThan(param);
+        return this.parseIsGreaterThan<Fields>(param);
       case FilterOperators.IS_LESS_THAN:
-        return this.parseIsLessThan(param);
+        return this.parseIsLessThan<Fields>(param);
     }
   }
 }

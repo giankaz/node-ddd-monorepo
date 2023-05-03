@@ -6,10 +6,7 @@ export interface UseCaseOptions {
   silent?: boolean;
 }
 export abstract class DefaultUseCase<Input, Output> {
-  protected abstract useCase(
-    input: Input,
-    options?: UseCaseOptions,
-  ): Promise<Output>;
+  abstract useCase(input: Input, options?: UseCaseOptions): Promise<Output>;
   abstract context: string;
 
   public async execute(
@@ -29,7 +26,7 @@ export abstract class DefaultUseCase<Input, Output> {
         .trim()
         .replace('async', '');
 
-      if (!options.silent) {
+      if (!options?.silent) {
         const message = err?.message || '';
         const solution = err?.solution || '';
 

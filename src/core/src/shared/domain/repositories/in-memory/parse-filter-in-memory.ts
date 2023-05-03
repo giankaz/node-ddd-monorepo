@@ -2,18 +2,21 @@ import { FilterParams, FilterOperators } from '../../../domain';
 
 import { ParseFilterInterface } from '../parse-filter';
 
-export class ParseFilterInMemory
+export class ParseFilterInMemory<Fields extends string>
   implements
     ParseFilterInterface<
       ReturnType<typeof Function>[],
+      Fields,
       ReturnType<typeof Function>
     >
 {
-  public parseArray(params: FilterParams[]): ReturnType<typeof Function>[] {
+  public parseArray(
+    params: FilterParams<Fields>[],
+  ): ReturnType<typeof Function>[] {
     return params.map(this.parse);
   }
 
-  public parse(param: FilterParams): ReturnType<typeof Function> {
+  public parse(param: FilterParams<Fields>): ReturnType<typeof Function> {
     switch (param.type) {
       case 'operator':
         return ParseFilterOperatorsInMemory.parse(param);
@@ -40,65 +43,69 @@ export class ParseFilterInMemory
 }
 
 export class ParseFilterOperatorsInMemory {
-  static parseContains(param: FilterParams) {
+  static parseContains<Fields extends string>(param: FilterParams<Fields>) {
     return new Function(
       'item',
       `return item.${[param.column]}.indexOf('${param.value}') > -1`,
     );
   }
 
-  static parseNotContains(param: FilterParams) {
+  static parseNotContains<Fields extends string>(param: FilterParams<Fields>) {
     return new Function(
       'item',
       `return item.${[param.column]}.indexOf('${param.value}') === -1`,
     );
   }
 
-  static parseEqual(param: FilterParams) {
+  static parseEqual<Fields extends string>(param: FilterParams<Fields>) {
     return new Function(
       'item',
       `return item.${[param.column]} === ${param.value}`,
     );
   }
 
-  static parseNotEqual(param: FilterParams) {
+  static parseNotEqual<Fields extends string>(param: FilterParams<Fields>) {
     return new Function(
       'item',
       `return item.${[param.column]} !== ${param.value}`,
     );
   }
 
-  static parseIsFilled(param: FilterParams) {
+  static parseIsFilled<Fields extends string>(param: FilterParams<Fields>) {
     return new Function('item', `return !!item.${[param.column]}`);
   }
 
-  static parseNotFilled(param: FilterParams) {
+  static parseNotFilled<Fields extends string>(param: FilterParams<Fields>) {
     return new Function('item', `return !item.${[param.column]}`);
   }
 
-  static parseHad(param: FilterParams) {
+  static parseHad<Fields extends string>(param: FilterParams<Fields>) {
     return new Function('item', `return !item.${[param.column]} > 0`);
   }
 
-  static parseNotHad(param: FilterParams) {
+  static parseNotHad<Fields extends string>(param: FilterParams<Fields>) {
     return new Function('item', `return !item.${[param.column]} === 0`);
   }
 
-  static parseIsGreaterThan(param: FilterParams) {
+  static parseIsGreaterThan<Fields extends string>(
+    param: FilterParams<Fields>,
+  ) {
     return new Function(
       'item',
       `return !item.${[param.column]} > ${param.value}`,
     );
   }
 
-  static parseIsLessThan(param: FilterParams) {
+  static parseIsLessThan<Fields extends string>(param: FilterParams<Fields>) {
     return new Function(
       'item',
       `return !item.${[param.column]} < ${param.value}`,
     );
   }
 
-  public static parse(param: FilterParams): ReturnType<typeof Function> {
+  public static parse<Fields extends string>(
+    param: FilterParams<Fields>,
+  ): ReturnType<typeof Function> {
     switch (param.operator) {
       case FilterOperators.CONTAINS:
         return this.parseContains(param);

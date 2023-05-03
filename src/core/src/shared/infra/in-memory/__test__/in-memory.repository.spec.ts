@@ -1,29 +1,20 @@
 import { IsNumber } from 'class-validator';
-import {
-  CommonEntityProps,
-  CoreError,
-  Entity,
-  FilterInMemory,
-  SearchParams,
-  SortDirection,
-} from '../../../domain';
+import { CommonEntityModel, CoreError, Entity } from '../../../domain';
 import { InMemoryRepository } from '../in-memory.repository';
 
-class StubEntityProps {
+class StubEntityModel extends CommonEntityModel {
   @IsNumber()
   price: number;
 
-  constructor(props: StubEntityProps) {
+  constructor(props: StubEntityModel) {
+    super(props);
     Object.assign(this, props);
   }
 }
 
-class StubEntity extends Entity<StubEntityProps> {
-  constructor(
-    public readonly props: StubEntityProps,
-    commonProps?: CommonEntityProps,
-  ) {
-    super(props, StubEntityProps, commonProps);
+class StubEntity extends Entity<StubEntityModel> {
+  constructor(props: StubEntityModel) {
+    super(props, StubEntityModel);
   }
 
   get price(): number {
@@ -31,43 +22,25 @@ class StubEntity extends Entity<StubEntityProps> {
   }
 }
 
+type StubFields = {} & Partial<
+  keyof Pick<StubEntityModel, keyof StubEntityModel>
+>;
+
 class StubInMemoryRepository extends InMemoryRepository<
-  StubEntityProps,
-  StubEntity
+  StubEntityModel,
+  StubEntity,
+  StubFields
 > {
-  sortableFields: string[] = ['name', 'created_at'];
-  searchableFields: string[] = ['name'];
-  filterableFields: string[] = ['name'];
-
-  protected async applyFilter(
-    items: StubEntity[],
-    filter: SearchParams,
-  ): Promise<StubEntity[]> {
-    if (!filter) {
-      return items;
-    }
-    return FilterInMemory.parse<StubEntityProps, StubEntity>(items, filter, {
-      searchableFields: this.searchableFields,
-      defaultSearch: [],
-    });
-  }
-
-  protected async applySort(
-    items: StubEntity[],
-    sort: string | null,
-    sort_dir: SortDirection | null,
-  ): Promise<StubEntity[]> {
-    return !sort
-      ? super.applySort(items, 'created_at', 'desc')
-      : super.applySort(items, sort, sort_dir);
-  }
+  sortableFields: StubFields[] = ['name', 'created_at'];
+  searchableFields: StubFields[] = ['name'];
+  filterableFields: StubFields[] = ['name'];
 }
 
 describe('InMemoryRepository Tests', () => {
   let repository: StubInMemoryRepository;
   beforeEach(() => (repository = new StubInMemoryRepository()));
   it('should inserts a new entity', async () => {
-    const entity = new StubEntity({ price: 5 }, { name: 'name value' });
+    const entity = new StubEntity({ price: 5, name: 'name value' });
     await repository.insert(entity);
     expect(entity.toJSON()).toStrictEqual(repository.items[0].toJSON());
   });
@@ -89,7 +62,7 @@ describe('InMemoryRepository Tests', () => {
   });
 
   it('should finds a entity by id', async () => {
-    const entity = new StubEntity({ price: 5 }, { name: 'name value' });
+    const entity = new StubEntity({ price: 5, name: 'name value' });
     await repository.insert(entity);
 
     let entityFound = await repository.findById(entity.id);
@@ -100,7 +73,7 @@ describe('InMemoryRepository Tests', () => {
   });
 
   it('should returns all entities', async () => {
-    const entity = new StubEntity({ price: 5 }, { name: 'name value' });
+    const entity = new StubEntity({ price: 5, name: 'name value' });
     await repository.insert(entity);
 
     const entities = await repository.findAll();
@@ -109,7 +82,7 @@ describe('InMemoryRepository Tests', () => {
   });
 
   it('should throws error on update when entity not found', () => {
-    const entity = new StubEntity({ price: 5 }, { name: 'name value' });
+    const entity = new StubEntity({ price: 5, name: 'name value' });
     expect(repository.update(entity)).rejects.toThrow(
       new CoreError({
         message: 'item not found',
@@ -118,13 +91,14 @@ describe('InMemoryRepository Tests', () => {
   });
 
   it('should updates an entity', async () => {
-    const entity = new StubEntity({ price: 5 }, { name: 'name value' });
+    const entity = new StubEntity({ price: 5, name: 'name value' });
     await repository.insert(entity);
 
-    const entityUpdated = new StubEntity(
-      { price: 1 },
-      { name: 'updated', id: entity.id },
-    );
+    const entityUpdated = new StubEntity({
+      price: 1,
+      name: 'updated',
+      id: entity.id,
+    });
     await repository.update(entityUpdated);
     expect(entityUpdated.toJSON()).toStrictEqual(repository.items[0].toJSON());
   });
@@ -146,7 +120,7 @@ describe('InMemoryRepository Tests', () => {
   });
 
   it('should deletes an entity', async () => {
-    const entity = new StubEntity({ price: 5 }, { name: 'name value' });
+    const entity = new StubEntity({ price: 5, name: 'name value' });
     await repository.insert(entity);
 
     await repository.delete(entity.id);

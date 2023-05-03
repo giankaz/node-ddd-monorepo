@@ -1,4 +1,4 @@
-import mongoose, { Connection, FilterQuery } from 'mongoose';
+import mongoose, { Connection, FilterQuery, Document } from 'mongoose';
 import {
   CommonStatus,
   Entity,
@@ -8,36 +8,39 @@ import {
   SearchResult,
 } from '../../domain';
 
-interface MongooseRepositoryConstructor<Props> {
+interface MongooseRepositoryConstructor<Model> {
   connection?: Connection;
   modelName: string;
-  Schema: mongoose.Schema<Props>;
+  Schema: mongoose.Schema<Model, Document>;
   collectionName: string;
 }
 
-export abstract class MongooseRepository<Props, E extends Entity<Props>>
-  implements RepositoryInterface<Props, E>
+export abstract class MongooseRepository<
+  Model,
+  E extends Entity<Model>,
+  Fields extends string,
+> implements RepositoryInterface<Model, E, Fields>
 {
-  private model: mongoose.Model<Props>;
+  private model: mongoose.Model<Model>;
 
-  abstract sortableFields: string[];
-  abstract searchableFields: string[];
-  abstract filterableFields: string[];
+  abstract sortableFields: Fields[];
+  abstract searchableFields: Fields[];
+  abstract filterableFields: Fields[];
 
   constructor({
     collectionName,
     modelName,
     Schema,
     connection,
-  }: MongooseRepositoryConstructor<Props>) {
+  }: MongooseRepositoryConstructor<Model>) {
     if (connection) {
-      this.model = connection.model<Props>(modelName, Schema, collectionName);
+      this.model = connection.model<Model>(modelName, Schema, collectionName);
     } else {
-      this.model = mongoose.model<Props>(modelName, Schema, collectionName);
+      this.model = mongoose.model<Model>(modelName, Schema, collectionName);
     }
   }
 
-  abstract toEntity(model: Props): E;
+  abstract toEntity(model: Model): E;
 
   async insert(entity: E): Promise<E> {
     const model = new this.model({ ...entity.toJSON() });
@@ -59,10 +62,10 @@ export abstract class MongooseRepository<Props, E extends Entity<Props>>
     return this.toEntity(model);
   }
 
-  async findByField(field: keyof Props, value: unknown): Promise<E> {
+  async findByField(field: keyof Model, value: unknown): Promise<E> {
     const model = await this.model.findOne({
       [field]: value,
-    } as FilterQuery<Props>);
+    } as FilterQuery<Model>);
 
     return this.toEntity(model);
   }
@@ -71,8 +74,10 @@ export abstract class MongooseRepository<Props, E extends Entity<Props>>
     return (await this.model.find()).map(this.toEntity);
   }
 
-  public async search(props: SearchParams): Promise<SearchResult<Props, E>> {
-    const parsedParams = new MongooseParseSearchParams().parse({
+  public async search(
+    props: SearchParams<Fields>,
+  ): Promise<SearchResult<Model, E, Fields>> {
+    const parsedParams = new MongooseParseSearchParams().parse<Fields>({
       params: props,
       filterableFields: this.filterableFields,
       sortableFields: this.sortableFields,

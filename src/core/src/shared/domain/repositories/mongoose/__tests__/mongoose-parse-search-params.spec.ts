@@ -3,8 +3,12 @@ import {
   FilterOperators,
   ParseSearchParams,
   SearchParams,
+  CommonEntityModel,
+  Entity,
 } from '../../../../domain';
 import { MongooseParseSearchParams } from '../mongoose-parse-search-params';
+
+type Fields = 'name' | 'created_at';
 
 describe('Test mongoose Parse search params', () => {
   it('should be successful if the operator is CONTAINS', () => {
@@ -14,7 +18,7 @@ describe('Test mongoose Parse search params', () => {
         column: 'name',
         operator: FilterOperators.CONTAINS,
         value: 'test',
-      } as FilterParams,
+      } as FilterParams<Fields>,
     ];
     const parseParams = {
       params: new SearchParams({
@@ -30,7 +34,7 @@ describe('Test mongoose Parse search params', () => {
       filterableFields: [],
       searchableFields: [],
       sortableFields: [],
-    } as ParseSearchParams;
+    } as ParseSearchParams<Fields>;
 
     const parseFilter = new MongooseParseSearchParams();
     expect(parseFilter.parse(parseParams)).toBeDefined();
@@ -43,7 +47,7 @@ describe('Test mongoose Parse search params', () => {
         column: 'name',
         operator: FilterOperators.CONTAINS,
         value: 'test',
-      } as FilterParams,
+      } as FilterParams<Fields>,
     ];
     const parseParams = {
       params: new SearchParams({
@@ -58,7 +62,7 @@ describe('Test mongoose Parse search params', () => {
       filterableFields: [],
       searchableFields: [],
       sortableFields: [],
-    } as ParseSearchParams;
+    } as ParseSearchParams<Fields>;
 
     const parseFilter = new MongooseParseSearchParams();
     expect(parseFilter.parse(parseParams)).toBeDefined();
@@ -71,7 +75,7 @@ describe('Test mongoose Parse search params', () => {
         column: 'name',
         operator: FilterOperators.CONTAINS,
         value: 'test',
-      } as FilterParams,
+      } as FilterParams<Fields>,
     ];
     const parseParams = {
       params: new SearchParams({
@@ -86,7 +90,7 @@ describe('Test mongoose Parse search params', () => {
       filterableFields: ['name'],
       searchableFields: [],
       sortableFields: ['created_at'],
-    } as ParseSearchParams;
+    } as ParseSearchParams<Fields>;
 
     const parseFilter = new MongooseParseSearchParams();
     expect(parseFilter.parse(parseParams)).toBeDefined();

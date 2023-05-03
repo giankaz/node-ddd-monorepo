@@ -1,6 +1,8 @@
 import { FilterParams, FilterOperators } from '../../../../domain';
 import { ParseFilterInMemory, ParseFilterOperatorsInMemory } from '../../';
 
+type Fields = 'name' | 'created_at';
+
 describe('Parse filter in memory test', () => {
   it('should be successful if the operator is CONTAINS', () => {
     const params = {
@@ -8,7 +10,7 @@ describe('Parse filter in memory test', () => {
       column: 'name',
       operator: 'CONTAINS',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
 
     const parseFilter = new ParseFilterInMemory();
     expect(parseFilter.parse(params)).toBeDefined();
@@ -20,7 +22,7 @@ describe('Parse filter in memory test', () => {
       column: 'name',
       operator: 'CONTAINS',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
 
     const parseFilter = new ParseFilterInMemory();
     expect(parseFilter.parse(params)).toBeDefined();
@@ -45,7 +47,7 @@ describe('Parse Filter Operator Tests', () => {
       column: 'name',
       operator: 'CONTAINS',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
     const test = ParseFilterOperatorsInMemory.parse(params);
     expect(
       test.toString().split('return')[1].replace('}', '').trim(),
@@ -58,7 +60,7 @@ describe('Parse Filter Operator Tests', () => {
       column: 'name',
       operator: 'NOT_CONTAINS',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
     const test = ParseFilterOperatorsInMemory.parse(params);
     expect(
       test.toString().split('return')[1].replace('}', '').trim(),
@@ -71,7 +73,7 @@ describe('Parse Filter Operator Tests', () => {
       column: 'name',
       operator: 'EQUAL',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
     const test = ParseFilterOperatorsInMemory.parse(params);
     expect(
       test.toString().split('return')[1].replace('}', '').trim(),
@@ -84,7 +86,7 @@ describe('Parse Filter Operator Tests', () => {
       column: 'name',
       operator: 'NOT_EQUAL',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
     const test = ParseFilterOperatorsInMemory.parse(params);
     expect(
       test.toString().split('return')[1].replace('}', '').trim(),
@@ -97,7 +99,7 @@ describe('Parse Filter Operator Tests', () => {
       column: 'name',
       operator: 'HAD',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
     const test = ParseFilterOperatorsInMemory.parse(params);
     expect(
       test.toString().split('return')[1].replace('}', '').trim(),
@@ -110,7 +112,7 @@ describe('Parse Filter Operator Tests', () => {
       column: 'name',
       operator: 'NOT_HAD',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
     const test = ParseFilterOperatorsInMemory.parse(params);
     expect(
       test.toString().split('return')[1].replace('}', '').trim(),
@@ -123,7 +125,7 @@ describe('Parse Filter Operator Tests', () => {
       column: 'name',
       operator: 'IS_FILLED',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
     const test = ParseFilterOperatorsInMemory.parse(params);
     expect(
       test.toString().split('return')[1].replace('}', '').trim(),
@@ -136,7 +138,7 @@ describe('Parse Filter Operator Tests', () => {
       column: 'name',
       operator: 'IS_NOT_FILLED',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
     const test = ParseFilterOperatorsInMemory.parse(params);
     expect(
       test.toString().split('return')[1].replace('}', '').trim(),
@@ -149,7 +151,7 @@ describe('Parse Filter Operator Tests', () => {
       column: 'name',
       operator: 'IS_GREATER_THAN',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
     const test = ParseFilterOperatorsInMemory.parse(params);
     expect(
       test.toString().split('return')[1].replace('}', '').trim(),
@@ -161,7 +163,7 @@ describe('Parse Filter Operator Tests', () => {
       column: 'name',
       operator: 'IS_LESS_THAN',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
     const test = ParseFilterOperatorsInMemory.parse(params);
     expect(
       test.toString().split('return')[1].replace('}', '').trim(),

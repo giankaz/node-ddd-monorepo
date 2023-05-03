@@ -1,10 +1,21 @@
 import {
+  CommonEntityModel,
   Entity,
   SearchParams,
   SearchParamsWithoutPagination,
   SearchResult,
   SortDirection,
 } from '../../../../domain';
+
+class MockModel extends CommonEntityModel {
+  constructor(props: MockModel) {
+    super(props);
+  }
+}
+
+class MockEntity extends Entity<MockModel> {}
+
+type Fields = 'name' | 'created_at';
 
 describe('Search Unit Tests', () => {
   describe('SearchParams Unit Tests', () => {
@@ -190,8 +201,8 @@ describe('Search Unit Tests', () => {
 
   describe('SearchResult Unit Tests', () => {
     test('constructor props', () => {
-      let result = new SearchResult({
-        items: [{} as Entity<unknown>],
+      let result = new SearchResult<MockModel, MockEntity, Fields>({
+        items: [{} as MockEntity],
         total: 4,
         current_page: 1,
         per_page: 2,
@@ -212,7 +223,7 @@ describe('Search Unit Tests', () => {
       });
 
       result = new SearchResult({
-        items: [{} as Entity<unknown>],
+        items: [{} as MockEntity],
         total: 4,
         current_page: 1,
         per_page: 2,

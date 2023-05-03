@@ -1,6 +1,6 @@
-export interface FilterParams {
+export interface FilterParams<Fields extends string> {
   type: 'string' | 'number' | 'date' | 'boolean' | 'operator';
-  column: string;
+  column: Fields;
   operator: FilterOperators;
   value: IFilterDateValue | string | boolean | number;
 }

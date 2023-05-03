@@ -4,39 +4,42 @@ import {
   FilterOperators,
   SearchParams,
   Entity,
-  CommonEntityProps,
+  CommonEntityModel,
   CommonStatus,
 } from '../../../domain';
 import { BaseSchemaFields, MongooseRepository } from '..';
 import { IsNumber } from 'class-validator';
-import { Schema } from 'mongoose';
+import { Document, Schema } from 'mongoose';
 
-class StubEntityProps {
+class StubEntityModel extends CommonEntityModel {
   @IsNumber()
   price: number;
 
-  constructor(props: StubEntityProps) {
+  constructor(props: StubEntityModel) {
+    super(props);
     Object.assign(this, props);
   }
 }
 
-class StubEntity extends Entity<StubEntityProps> {
-  constructor(public props: StubEntityProps, commonProps?: CommonEntityProps) {
-    super(props, StubEntityProps, commonProps);
+class StubEntity extends Entity<StubEntityModel> {
+  constructor(props: StubEntityModel) {
+    super(props, StubEntityModel);
   }
 
   get price() {
     return this.props.price;
   }
 
-  changePrice(newPrice: number) {
+  set price(newPrice: number) {
     this.props.price = newPrice;
     this.update();
   }
 }
-interface IStubEntity extends StubEntityProps, CommonEntityProps {}
+interface IStubEntity extends StubEntityModel, CommonEntityModel {}
 
-const stubSchema = new Schema({
+type Fields = 'name' | 'created_at' | 'id';
+
+const stubSchema = new Schema<IStubEntity, Document>({
   ...BaseSchemaFields,
   price: {
     type: Number,
@@ -44,10 +47,14 @@ const stubSchema = new Schema({
   },
 });
 
-class StubRepository extends MongooseRepository<IStubEntity, StubEntity> {
-  sortableFields: string[] = ['name', 'created_at'];
-  searchableFields: string[] = ['name'];
-  filterableFields: string[] = ['id', 'name'];
+class StubRepository extends MongooseRepository<
+  IStubEntity,
+  StubEntity,
+  Fields
+> {
+  sortableFields: Fields[] = ['name', 'created_at'];
+  searchableFields: Fields[] = ['name'];
+  filterableFields: Fields[] = ['id', 'name'];
 
   constructor() {
     super({
@@ -58,18 +65,14 @@ class StubRepository extends MongooseRepository<IStubEntity, StubEntity> {
   }
 
   public toEntity(model: IStubEntity): StubEntity {
-    return new StubEntity(
-      {
-        price: model.price,
-      },
-      {
-        id: model.id,
-        created_at: model.created_at,
-        name: model.name,
-        status: model.status,
-        updated_at: model.updated_at,
-      },
-    );
+    return new StubEntity({
+      price: model.price,
+      id: model.id,
+      created_at: model.created_at,
+      name: model.name,
+      status: model.status,
+      updated_at: model.updated_at,
+    });
   }
 }
 
@@ -81,33 +84,21 @@ describe('mongoose repository tests', () => {
 
   beforeEach(() => {
     repository = new StubRepository();
-    randomEntity = new StubEntity(
-      {
-        price: 5,
-      },
-      {
-        created_at: new Date(),
-        name: uuid(),
-      },
-    );
-    randomEntity2 = new StubEntity(
-      {
-        price: 10,
-      },
-      {
-        created_at: new Date(),
-        name: uuid(),
-      },
-    );
-    randomEntity3 = new StubEntity(
-      {
-        price: 15,
-      },
-      {
-        created_at: new Date(),
-        name: uuid(),
-      },
-    );
+    randomEntity = new StubEntity({
+      price: 5,
+      created_at: new Date(),
+      name: uuid(),
+    });
+    randomEntity2 = new StubEntity({
+      price: 10,
+      created_at: new Date(),
+      name: uuid(),
+    });
+    randomEntity3 = new StubEntity({
+      price: 15,
+      created_at: new Date(),
+      name: uuid(),
+    });
   });
 
   it('should create with the insert method and find with findById', async () => {
@@ -153,7 +144,7 @@ describe('mongoose repository tests', () => {
   it('should run the method search using filters', async () => {
     await repository.insertMany([randomEntity, randomEntity2, randomEntity3]);
 
-    const filter: FilterParams[] = [
+    const filter: FilterParams<Fields>[] = [
       {
         column: 'name',
         operator: FilterOperators.CONTAINS,
@@ -174,7 +165,7 @@ describe('mongoose repository tests', () => {
 
     expect(randomEntity.toJSON()).toStrictEqual(result.items[0].toJSON());
 
-    const filter2: FilterParams[] = [
+    const filter2: FilterParams<Fields>[] = [
       {
         column: 'name',
         operator: FilterOperators.CONTAINS,
@@ -195,7 +186,7 @@ describe('mongoose repository tests', () => {
 
     expect(randomEntity2.toJSON()).toStrictEqual(result2.items[0].toJSON());
 
-    const filter3: FilterParams[] = [
+    const filter3: FilterParams<Fields>[] = [
       {
         column: 'id',
         operator: FilterOperators.EQUAL,
@@ -234,7 +225,7 @@ describe('mongoose repository tests', () => {
   search for different columns`, async () => {
     await repository.insertMany([randomEntity, randomEntity2, randomEntity3]);
 
-    const filter: FilterParams[] = [
+    const filter: FilterParams<Fields>[] = [
       {
         column: 'id',
         operator: FilterOperators.EQUAL,
@@ -267,7 +258,7 @@ describe('mongoose repository tests', () => {
       ).toStrictEqual(true);
     });
 
-    const filter2: FilterParams[] = [
+    const filter2: FilterParams<Fields>[] = [
       {
         column: 'name',
         operator: FilterOperators.EQUAL,
@@ -314,7 +305,7 @@ describe('mongoose repository tests', () => {
   it('should run the method search using search', async () => {
     await repository.insertMany([randomEntity, randomEntity2, randomEntity3]);
 
-    const params = new SearchParams({
+    const params = new SearchParams<Fields>({
       search: randomEntity.name,
     });
 
@@ -331,8 +322,8 @@ describe('mongoose repository tests', () => {
     const NEW_NAME = 'NEW_NAME';
     const NEW_PRICE = 100;
 
-    entity.changeName(NEW_NAME);
-    entity.changePrice(NEW_PRICE);
+    entity.name = NEW_NAME;
+    entity.price = NEW_PRICE;
 
     await repository.update(entity);
 

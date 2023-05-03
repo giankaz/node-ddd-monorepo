@@ -7,16 +7,16 @@ import {
 } from './parse-filter-in-memory';
 import { SearchParams } from '../searchable.repository';
 
-interface ApplyFilterDefaultSearch {
-  defaultSearch: FilterParams[];
+interface ApplyFilterDefaultSearch<Fields extends string> {
+  defaultSearch: FilterParams<Fields>[];
   searchableFields: string[];
 }
 
 export class FilterInMemory {
-  static parse<Props, E extends Entity<Props>>(
+  static parse<Model, E extends Entity<Model>, Fields extends string>(
     items: E[],
-    filter: Omit<SearchParams, 'page' | 'per_page'> | null,
-    config: ApplyFilterDefaultSearch,
+    filter: Omit<SearchParams<Fields>, 'page' | 'per_page'> | null,
+    config: ApplyFilterDefaultSearch<Fields>,
   ): E[] {
     const results: E[] = [];
     const filterParser = new ParseFilterInMemory();
@@ -53,8 +53,7 @@ export class FilterInMemory {
       });
       results.push(...result);
     });
-    return results.filter(
-      (v, i, a) => a.findIndex((v2) => v2.id === v.id) === i,
-    );
+
+    return results;
   }
 }

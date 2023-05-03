@@ -1,13 +1,13 @@
 import { SearchParams } from './searchable.repository';
 
-export interface ParseSearchParams {
-  params: SearchParams;
+export interface ParseSearchParams<Fields extends string> {
+  params: SearchParams<Fields>;
   defaultSearch: object;
-  sortableFields: string[];
-  searchableFields: string[];
-  filterableFields: string[];
+  sortableFields: Fields[];
+  searchableFields: Fields[];
+  filterableFields: Fields[];
 }
 
 export interface ParseSearchParamsInterface<Return> {
-  parse(search: ParseSearchParams): Return;
+  parse<Fields extends string>(search: ParseSearchParams<Fields>): Return;
 }

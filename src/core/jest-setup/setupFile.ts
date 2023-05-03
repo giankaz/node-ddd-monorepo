@@ -2,16 +2,6 @@ import 'reflect-metadata';
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
-global.console = {
-  ...console,
-  // uncomment to ignore a specific log level
-  // log: jest.fn().mockImplementation(() => {}),
-  debug: jest.fn().mockImplementation(() => undefined),
-  info: jest.fn().mockImplementation(() => undefined),
-  warn: jest.fn().mockImplementation(() => undefined),
-  error: jest.fn().mockImplementation(() => undefined),
-};
-
 let mongoServer: MongoMemoryServer;
 
 beforeAll(async () => {

@@ -1,21 +1,29 @@
 import {
   CoreError,
   Entity,
+  FilterInMemory,
+  FilterOperators,
+  FilterParams,
   RepositoryInterface,
   SearchParams,
   SearchResult,
   SortDirection,
 } from '../../domain';
 
-export abstract class InMemoryRepository<Props, E extends Entity<Props>>
-  implements RepositoryInterface<Props, E>
+export abstract class InMemoryRepository<
+  Model,
+  E extends Entity<Model>,
+  Fields extends string,
+> implements RepositoryInterface<Model, E, Fields>
 {
   items: E[] = [];
-  abstract sortableFields: string[];
-  abstract searchableFields: string[];
-  abstract filterableFields: string[];
+  abstract sortableFields: Fields[];
+  abstract searchableFields: Fields[];
+  abstract filterableFields: Fields[];
 
-  async search(props: SearchParams): Promise<SearchResult<Props, E>> {
+  async search(
+    props: SearchParams<Fields>,
+  ): Promise<SearchResult<Model, E, Fields>> {
     const itemsFiltered =
       !props ||
       (!props.defaultSearch &&
@@ -46,26 +54,48 @@ export abstract class InMemoryRepository<Props, E extends Entity<Props>>
     });
   }
 
-  protected abstract applyFilter(
+  public async applyFilter(
     items: E[],
-    filter: Omit<SearchParams, 'page' | 'per_page'> | null,
-  ): Promise<E[]>;
+    filter: SearchParams<Fields>,
+  ): Promise<E[]> {
+    if (!filter) {
+      return items;
+    }
 
-  protected async applySort(
+    const defaultSearch = filter.defaultSearch
+      ? Object.keys(filter.defaultSearch).map(
+          (key) =>
+            ({
+              column: key,
+              operator: FilterOperators.EQUAL,
+              type: typeof filter.defaultSearch[key],
+              value: filter?.defaultSearch ? filter.defaultSearch[key] : [],
+            } as FilterParams<Fields>),
+        )
+      : [];
+
+    return FilterInMemory.parse<Model, E, Fields>(items, filter, {
+      searchableFields: this.searchableFields,
+      defaultSearch,
+    });
+  }
+
+  public async applySort(
     items: E[],
-    sort: string | null,
+    sort: Fields | null,
     sort_dir: SortDirection | null,
   ): Promise<E[]> {
     if (!sort || !this.sortableFields.includes(sort)) {
       return items;
     }
+    const sortAsKeyofE = sort as keyof E;
 
     return [...items].sort((a, b) => {
-      if (a[sort] < b[sort]) {
+      if (a[sortAsKeyofE] < b[sortAsKeyofE]) {
         return sort_dir === 'asc' ? -1 : 1;
       }
 
-      if (a[sort] > b[sort]) {
+      if (a[sortAsKeyofE] > b[sortAsKeyofE]) {
         return sort_dir === 'asc' ? 1 : -1;
       }
 
@@ -75,8 +105,8 @@ export abstract class InMemoryRepository<Props, E extends Entity<Props>>
 
   protected async applyPaginate(
     items: E[],
-    page: SearchParams['page'],
-    per_page: SearchParams['per_page'],
+    page: SearchParams<Fields>['page'],
+    per_page: SearchParams<Fields>['per_page'],
   ): Promise<E[]> {
     const start = (page - 1) * per_page; // 1 * 15 = 15
     const limit = start + per_page; // 15 + 15 = 30
@@ -98,7 +128,7 @@ export abstract class InMemoryRepository<Props, E extends Entity<Props>>
     return this._get(_id);
   }
 
-  async findByField(field: keyof Props, value: unknown): Promise<E> {
+  async findByField(field: keyof Model, value: unknown): Promise<E> {
     return this.items.find((item) => item.toJSON()[field] === value);
   }
 

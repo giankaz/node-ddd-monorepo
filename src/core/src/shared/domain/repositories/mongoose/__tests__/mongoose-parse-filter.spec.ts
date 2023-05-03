@@ -4,6 +4,8 @@ import {
   MongooseParseFilterOperators,
 } from '../mongoose-parse-filter';
 
+type Fields = 'name' | 'created_at';
+
 describe('Test mongoose Parse filter', () => {
   it('should be successful if the operator is CONTAINS', () => {
     const params = {
@@ -11,7 +13,7 @@ describe('Test mongoose Parse filter', () => {
       column: 'name',
       operator: 'CONTAINS',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
 
     const parseFilter = new MongooseParseFilter();
     expect(parseFilter.parse(params)).toBeDefined();
@@ -23,7 +25,7 @@ describe('Test mongoose Parse filter', () => {
       column: 'name',
       operator: 'CONTAINS',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
 
     const parseFilter = new MongooseParseFilter();
     expect(parseFilter.parse(params)).toBeDefined();
@@ -51,7 +53,7 @@ describe('Parse Filter Operator Tests', () => {
       column: 'name',
       operator: 'CONTAINS',
       value: 'test',
-    } as FilterParams;
+    } as FilterParams<Fields>;
     const test = MongooseParseFilterOperators.parse(params);
     expect(test).toStrictEqual({
       name: /test/i,
@@ -64,7 +66,7 @@ describe('Parse Filter Operator Tests', () => {
       column: 'name',
       operator: 'NOT_CONTAINS',
       value: 'test',
-    } as FilterParams;
+    } as FilterParams<Fields>;
     const test = MongooseParseFilterOperators.parse(params);
     expect(test).toStrictEqual({
       name: {
@@ -79,7 +81,7 @@ describe('Parse Filter Operator Tests', () => {
       column: 'name',
       operator: 'EQUAL',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
     const test = MongooseParseFilterOperators.parse(params);
     expect(test).toStrictEqual({
       name: 'teste',
@@ -92,7 +94,7 @@ describe('Parse Filter Operator Tests', () => {
       column: 'name',
       operator: 'NOT_EQUAL',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
     const test = MongooseParseFilterOperators.parse(params);
     expect(test).toStrictEqual({
       name: {
@@ -107,7 +109,7 @@ describe('Parse Filter Operator Tests', () => {
       column: 'name',
       operator: 'HAD',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
     const test = MongooseParseFilterOperators.parse(params);
     expect(test).toStrictEqual({
       name: {
@@ -122,7 +124,7 @@ describe('Parse Filter Operator Tests', () => {
       column: 'name',
       operator: 'NOT_HAD',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
     const test = MongooseParseFilterOperators.parse(params);
     expect(test).toStrictEqual({
       name: 0,
@@ -135,7 +137,7 @@ describe('Parse Filter Operator Tests', () => {
       column: 'name',
       operator: 'IS_FILLED',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
     const test = MongooseParseFilterOperators.parse(params);
     expect(test).toStrictEqual({
       name: {
@@ -150,7 +152,7 @@ describe('Parse Filter Operator Tests', () => {
       column: 'name',
       operator: 'IS_NOT_FILLED',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
     const test = MongooseParseFilterOperators.parse(params);
     expect(test).toStrictEqual({
       name: null,
@@ -163,7 +165,7 @@ describe('Parse Filter Operator Tests', () => {
       column: 'name',
       operator: 'IS_GREATER_THAN',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
     const test = MongooseParseFilterOperators.parse(params);
     expect(test).toStrictEqual({
       name: {
@@ -177,7 +179,7 @@ describe('Parse Filter Operator Tests', () => {
       column: 'name',
       operator: 'IS_LESS_THAN',
       value: 'teste',
-    } as FilterParams;
+    } as FilterParams<Fields>;
     const test = MongooseParseFilterOperators.parse(params);
     expect(test).toStrictEqual({
       name: {

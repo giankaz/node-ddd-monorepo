@@ -25,24 +25,28 @@ interface MongooseSearchParamsReturn {
 export class MongooseParseSearchParams
   implements ParseSearchParamsInterface<MongooseSearchParamsReturn>
 {
-  parse(searchParams: ParseSearchParams): MongooseSearchParamsReturn {
+  parse<Fields extends string>(
+    searchParams: ParseSearchParams<Fields>,
+  ): MongooseSearchParamsReturn {
     return {
-      find: Find.parse(searchParams),
-      sort: Sort.parse(searchParams),
-      skip: Skip.parse(searchParams.params),
+      find: Find.parse<Fields>(searchParams),
+      sort: Sort.parse<Fields>(searchParams),
+      skip: Skip.parse<Fields>(searchParams.params),
       limit: searchParams.params.per_page,
     };
   }
 }
 
 class Skip {
-  static parse(params: SearchParams): number {
+  static parse<Fields extends string>(params: SearchParams<Fields>): number {
     return (Math.max(1, params.page) - 1) * params.per_page;
   }
 }
 
 class Sort {
-  static parse(searchParams: ParseSearchParams): SortReturn {
+  static parse<Fields extends string>(
+    searchParams: ParseSearchParams<Fields>,
+  ): SortReturn {
     if (
       !searchParams.params.sort ||
       !searchParams.sortableFields.includes(searchParams.params.sort)
@@ -55,7 +59,9 @@ class Sort {
 }
 
 class Find {
-  static parse(searchParams: ParseSearchParams): FindReturn {
+  static parse<Fields extends string>(
+    searchParams: ParseSearchParams<Fields>,
+  ): FindReturn {
     const { filterableFields, params, searchableFields, defaultSearch } =
       searchParams;
     const filters = params?.filter

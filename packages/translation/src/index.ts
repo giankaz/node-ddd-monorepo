@@ -8,8 +8,10 @@ export type Langs = {
 export const languages: Langs = {
   en: {
     sent: 'sent',
+    test: 'test',
   },
   pt: {
     sent: 'Enviado',
+    test: 'teste',
   },
 };

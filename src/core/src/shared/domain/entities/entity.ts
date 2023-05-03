@@ -1,6 +1,8 @@
 import { IsDate, IsEnum, IsOptional, IsString } from 'class-validator';
 import { ValidatorFields } from '../validators';
 import { ValueObject, UniqueEntityId } from '../value-objects';
+import { CoreError } from '../errors';
+import { classValidatorErrorParse } from '../../utils';
 
 export enum CommonStatus {
   ACTIVE = 'ACTIVE',
@@ -8,7 +10,7 @@ export enum CommonStatus {
   DELETED = 'DELETED',
 }
 
-export class CommonEntityProps {
+export class CommonEntityModel {
   @IsString()
   @IsOptional()
   id?: string;
@@ -18,38 +20,53 @@ export class CommonEntityProps {
   name?: string;
 
   @IsEnum(CommonStatus)
+  @IsOptional()
   status?: CommonStatus;
 
   @IsDate()
+  @IsOptional()
   created_at?: Date;
 
   @IsDate()
   @IsOptional()
   updated_at?: Date | null;
 
-  constructor(props: CommonEntityProps) {
-    Object.assign(this, props);
+  constructor(props: CommonEntityModel) {
+    for (const key in props) {
+      if (key in CommonEntityModel) {
+        Object.assign(this, props);
+      }
+    }
   }
 }
 
-export abstract class Entity<Props> {
+export abstract class Entity<Model extends CommonEntityModel> {
   public readonly uniqueEntityId: UniqueEntityId;
 
   constructor(
-    public readonly props: Props,
-    public readonly Rules: { new (props: Props): Props },
-    private readonly commonProps?: CommonEntityProps,
+    /**
+     * All the entity props
+     * @param {Model}
+     */
+    public readonly props: Model,
+
+    /**
+     * Pass the Class Model of the entity
+     * @param {Model}
+     */
+    private readonly ClassModel: { new (props: Model): Model },
   ) {
-    this.uniqueEntityId = commonProps?.id
-      ? new UniqueEntityId(commonProps.id)
+    this.uniqueEntityId = props?.id
+      ? new UniqueEntityId(props.id)
       : new UniqueEntityId();
 
-    this.commonProps = {
-      created_at: commonProps?.created_at || new Date(),
-      updated_at: commonProps?.updated_at || null,
+    this.props = {
+      ...props,
+      created_at: props?.created_at || new Date(),
       id: this.uniqueEntityId.value,
-      name: commonProps?.name,
-      status: commonProps?.status || CommonStatus.ACTIVE,
+      name: props?.name,
+      status: props?.status || CommonStatus.ACTIVE,
+      updated_at: props?.updated_at || null,
     };
 
     this.validate();
@@ -60,37 +77,36 @@ export abstract class Entity<Props> {
   }
 
   get name(): string {
-    return this.commonProps.name;
+    return this.props.name;
+  }
+
+  set name(newName: string) {
+    this.props.name = newName;
+    this.update();
   }
 
   get status(): CommonStatus {
-    return this.commonProps.status;
+    return this.props.status;
   }
 
   get created_at(): Date {
-    return this.commonProps.created_at;
+    return this.props.created_at;
   }
 
   get updated_at(): Date | null {
-    return this.commonProps.updated_at;
+    return this.props.updated_at;
   }
 
   public validate(): boolean {
     const validatorProps = new ValidatorFields();
-    const isValidProps = validatorProps.validate(new this.Rules(this.props));
-    const validatorCommonProps = new ValidatorFields();
-    const isValidCommonProps = validatorCommonProps.validate(
-      new CommonEntityProps({
-        created_at: this.created_at,
-        id: this.id,
-        name: this.name,
-        status: this.status,
-        updated_at: this.updated_at,
-      }),
+    const isValidProps = validatorProps.validate(
+      new this.ClassModel(this.props),
     );
 
-    if (!isValidProps || !isValidCommonProps) {
-      throw new Error();
+    if (!isValidProps) {
+      throw new CoreError({
+        message: classValidatorErrorParse(validatorProps.errors),
+      });
     }
 
     return true;
@@ -98,26 +114,21 @@ export abstract class Entity<Props> {
 
   public update() {
     this.validate();
-    this.commonProps.updated_at = new Date();
-  }
-
-  public changeName(newName: string) {
-    this.commonProps.name = newName;
-    this.update();
+    this.props.updated_at = new Date();
   }
 
   public activate() {
-    this.commonProps.status = CommonStatus.ACTIVE;
+    this.props.status = CommonStatus.ACTIVE;
     this.update();
   }
 
   public softDelete() {
-    this.commonProps.status = CommonStatus.DELETED;
+    this.props.status = CommonStatus.DELETED;
     this.update();
   }
 
   public inactivate() {
-    this.commonProps.status = CommonStatus.INACTIVE;
+    this.props.status = CommonStatus.INACTIVE;
     this.update();
   }
 
@@ -127,7 +138,7 @@ export abstract class Entity<Props> {
 
   public isInactive = () => this.status === CommonStatus.INACTIVE;
 
-  toJSON(): Required<CommonEntityProps & Props> {
+  toJSON(): Required<CommonEntityModel & Model> {
     const data = {};
     for (const key of Object.keys(this.props || {})) {
       if (this.props[key] instanceof ValueObject) {
@@ -142,24 +153,11 @@ export abstract class Entity<Props> {
       }
     }
 
-    for (const key of Object.keys(this.commonProps || {})) {
-      if (this.commonProps[key] instanceof ValueObject) {
-        data[key] = this.commonProps[key].toJSON();
-      } else if (
-        Array.isArray(this.commonProps[key]) &&
-        this.commonProps[key].every((prop) => prop instanceof ValueObject)
-      ) {
-        data[key] = this.commonProps[key].map((prop) => prop.toJSON());
-      } else {
-        data[key] = this.commonProps[key];
-      }
-    }
-
     return JSON.parse(
       JSON.stringify({
         id: this.id,
         ...data,
       }),
-    ) as Required<CommonEntityProps & Props>;
+    ) as Required<CommonEntityModel & Model>;
   }
 }
