@@ -1,0 +1,20 @@
+{
+  "cabelo?": "string",
+  "adress": "number",
+  "ata": "number[]",
+  "fala": "Date",
+  "outro": "string[]",
+  "active?": "boolean",
+  "obj": {
+    "test": "string",
+    "name": "string",
+    "opt?": "string[]",
+    "num": "number",
+    "subobj": {
+      "sad": "string",
+      "lastobj": {
+        "fufu": "string"
+      }
+    }
+  }
+}

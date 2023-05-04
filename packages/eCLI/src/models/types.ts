@@ -1,0 +1,16 @@
+export type PropsTypes =
+  | 'string'
+  | 'number'
+  | 'Date'
+  | 'boolean'
+  | 'object'
+  | 'string[]'
+  | 'number[]'
+  | 'number'
+  | 'string?'
+  | 'number?'
+  | 'Date?'
+  | 'boolean?'
+  | 'object?'
+  | 'string[]?'
+  | 'number[]?';

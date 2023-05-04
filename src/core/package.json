@@ -12,7 +12,6 @@
     "cti:clean": "cti clean ./src",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "clean:tsinfo": "rm -rf ./tsconfig.tsbuildinfo",
-    "gen:entity": "node ../../scripts/gen-entity.js",
     "format": "prettier --write \"**/*.{ts,tsx,md}\" --loglevel silent"
   },
   "keywords": [],

@@ -9,7 +9,7 @@
 
 ## Atual Features
 
-- Scalable DDD architecture 
+- Scalable DDD architecture
 - Entity generator CLI - e-CLI (v0.0.1)
 - Test Enviroment Well Configured
 - Optimal Developer Experience
@@ -32,22 +32,18 @@
 - [] Show loading spinners correctly for tasks;
 - [] Publish as npm package.
 
-
 ### NestJS CLI working together with the entity generator:
 
 If we can automate the the core, we can automate the routes too! e-NestCLI (v0.0.0)
 
-***Generate a NestJS full module:***
+**_Generate a NestJS full module:_**
 
 - [] - Module;
 - [] - Providers;
 - [] - Events;
 - [] - Module;
 - [] - Decorators;
-- [] - Rest*;
-- [] - GraphQL*;
-- [] - GRPC*;
+- [] - Rest\*;
+- [] - GraphQL\*;
+- [] - GRPC\*;
 - [] - Swagger Routes;
-
-
-

@@ -12,7 +12,7 @@
     "core:test": "turbo run core#test",
     "clear:turbo": "find . -type d -name '.turbo' -print0 | xargs -0 rm -rf",
     "prepare": "husky install",
-    "gen:entity": "node ./scripts/gen-entity.js"
+    "e-cli:build": "pnpm --filter=e-cli build; pnpm add -D ./packages/eCLI -w"
   },
   "husky": {
     "hooks": {
@@ -24,12 +24,11 @@
     "@commitlint/cli": "^17.6.1",
     "@commitlint/config-conventional": "^17.6.1",
     "@types/jest": "^29.5.1",
+    "e-cli": "link:packages/eCLI",
     "eslint": "^7.32.0",
     "eslint-config-custom": "workspace:*",
     "husky": "^8.0.3",
-    "listr": "^0.14.3",
     "prettier": "^2.5.1",
-    "prompts": "^2.4.2",
     "turbo": "latest"
   },
   "packageManager": "pnpm@7.15.0",
