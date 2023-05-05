@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "build": "turbo run build; pnpm format; pnpm i",
+    "build": "pnpm i; turbo run build; pnpm format",
     "dev": "turbo run dev",
     "lint": "turbo run lint -- --max-warnings=0",
     "test": "turbo run test",
@@ -12,7 +12,9 @@
     "core:test": "turbo run core#test",
     "clear:turbo": "find . -type d -name '.turbo' -print0 | xargs -0 rm -rf",
     "prepare": "husky install",
-    "e-cli:build": "pnpm --filter=e-cli build; pnpm add -D ./packages/eCLI -w"
+    "ecli:build": "pnpm --filter=entity-cli build; pnpm add -D ./packages/entity-cli -w",
+    "g:e": "pnpm ecli gen -p ./src/core/src",
+    "g:e:json": "pnpm ecli gen -p ./src/core/src --json "
   },
   "husky": {
     "hooks": {
