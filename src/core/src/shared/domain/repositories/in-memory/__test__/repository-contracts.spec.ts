@@ -1,5 +1,5 @@
 import {
-  CommonEntityModel,
+  CommonEntityValidator,
   Entity,
   SearchParams,
   SearchParamsWithoutPagination,
@@ -7,13 +7,13 @@ import {
   SortDirection,
 } from '../../../../domain';
 
-class MockModel extends CommonEntityModel {
-  constructor(props: MockModel) {
+class MockValidator extends CommonEntityValidator {
+  constructor(props: MockValidator) {
     super(props);
   }
 }
 
-class MockEntity extends Entity<MockModel> {}
+class MockEntity extends Entity<MockValidator> {}
 
 type Fields = 'name' | 'created_at';
 
@@ -201,7 +201,7 @@ describe('Search Unit Tests', () => {
 
   describe('SearchResult Unit Tests', () => {
     test('constructor props', () => {
-      let result = new SearchResult<MockModel, MockEntity, Fields>({
+      let result = new SearchResult<MockValidator, MockEntity, Fields>({
         items: [{} as MockEntity],
         total: 4,
         current_page: 1,

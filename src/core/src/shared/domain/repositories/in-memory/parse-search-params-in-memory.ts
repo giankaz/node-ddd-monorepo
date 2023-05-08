@@ -5,7 +5,7 @@ import {
   ParseFilterInMemory,
   ParseFilterOperatorsInMemory,
 } from './parse-filter-in-memory';
-import { SearchParams } from '../searchable.repository';
+import { SearchParams } from '../repository.interface';
 
 interface ApplyFilterDefaultSearch<Fields extends string> {
   defaultSearch: FilterParams<Fields>[];
@@ -13,7 +13,7 @@ interface ApplyFilterDefaultSearch<Fields extends string> {
 }
 
 export class FilterInMemory {
-  static parse<Model, E extends Entity<Model>, Fields extends string>(
+  static parse<Props, E extends Entity<Props>, Fields extends string>(
     items: E[],
     filter: Omit<SearchParams<Fields>, 'page' | 'per_page'> | null,
     config: ApplyFilterDefaultSearch<Fields>,

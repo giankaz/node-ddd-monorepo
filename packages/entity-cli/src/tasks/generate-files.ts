@@ -6,18 +6,21 @@ import { parseRandom } from '../parsers/random.parser';
 import { parseMongo } from '../parsers/mongo.parser';
 import { formatAndBuild } from './format-and-build';
 import Listr from 'listr';
-import { testNewFiles } from './test-new-files';
+import { testNewFiles, testNewNestFiles } from './test-new-files';
 import { renameFilesAndFolders } from '../utils/rename-files-and-folders';
 import {
   Ocurrances,
   insertAfterOccurrences,
 } from '../utils/insertAfterOccurrences';
+import { generateNestFiles } from './generate-nest-files';
 
 export async function generateFiles(
   name: string,
   assetDir: string,
   outputDir: string,
   props: Props,
+  nestDir: string,
+  nestPath?: string,
 ) {
   execSync(`cp -r ${assetDir} ${outputDir}`);
 
@@ -27,13 +30,13 @@ export async function generateFiles(
   const nameUpper = name.toUpperCase();
 
   execSync(
-    `find ${outputDir} -type f -exec sed -i 's/example/${nameLowercase}/g' {} +`,
+    `find ${outputDir} -type f -exec sed -i 's/xxxxeclixxxx/${nameLowercase}/g' {} +`,
   );
   execSync(
-    `find ${outputDir} -type f -exec sed -i 's/Example/${nameUppercaseFirst}/g' {} +`,
+    `find ${outputDir} -type f -exec sed -i 's/Xxxxeclixxxx/${nameUppercaseFirst}/g' {} +`,
   );
   execSync(
-    `find ${outputDir} -type f -exec sed -i 's/EXAMPLE/${nameUpper}/g' {} +`,
+    `find ${outputDir} -type f -exec sed -i 's/XXXXECLIXXXX/${nameUpper}/g' {} +`,
   );
 
   renameFilesAndFolders(outputDir, nameLowercase);
@@ -111,10 +114,24 @@ export async function generateFiles(
       getter = `get ${parsedKey}():${parsedType}{ return this.props?.${parsedKey}};\n\n`;
     }
 
-    let setter = `set ${parsedKey}(new${keyUppercaseFirstParsed}: ${parsedType}){ this.props.${parsedKey}=new${keyUppercaseFirstParsed};this.update()};\n\n`;
+    let setter = `set ${parsedKey}(new${keyUppercaseFirstParsed}: ${parsedType}){ 
+      this.props.${parsedKey}= ${
+      validation === 'Date'
+        ? `new Date(new${keyUppercaseFirstParsed})`
+        : `new${keyUppercaseFirstParsed}`
+    };
+      this.update()
+    };\n`;
 
     if (isOptional) {
-      setter = `set ${parsedKey}(new${keyUppercaseFirstParsed}:${parsedType}|null){this.props.${parsedKey}=new${keyUppercaseFirstParsed};this.update()};\n\n`;
+      setter = `set ${parsedKey}(new${keyUppercaseFirstParsed}:${parsedType}|null){
+        this.props.${parsedKey}= ${
+        validation === 'Date'
+          ? `new Date(new${keyUppercaseFirstParsed})`
+          : `new${keyUppercaseFirstParsed}`
+      };
+        this.update()
+      };\n`;
     }
 
     ocurrances.push({
@@ -138,27 +155,27 @@ export async function generateFiles(
       });
     }
 
-    const context = `context: '${name} - ${key} - ${parsedType}'`;
+    const message = isOptional ? `` : `message: Translations.x_is_required`;
 
     let validator = `@classValidator.Is${validation}(${
       isArray
         ? isNumber || isObject
-          ? `{} , { each: true, ${context} }`
-          : `{ each: true, ${context} }`
+          ? `{} , { each: true, ${message} }`
+          : `{ each: true, ${message} }`
         : isNumber || isObject
-        ? `{}, { ${context} }`
-        : `{ ${context} }`
+        ? `{}, { ${message} }`
+        : `{ ${message} }`
     })\n ${key}:${parsedType}; \n\n`;
 
     if (isOptional) {
       validator = `@classValidator.Is${validation}(${
         isArray
           ? isNumber || isObject
-            ? `{} , { each: true, ${context} }`
-            : `{ each: true, { ${context} }`
+            ? `{} , { each: true, ${message} }`
+            : `{ each: true, { ${message} }`
           : isNumber || isObject
-          ? `{}, { ${context} }`
-          : `{ ${context} }`
+          ? `{}, { ${message} }`
+          : `{ ${message} }`
       })\n @classValidator.IsOptional() \n ${key}: ${parsedType};\n\n`;
     }
 
@@ -175,6 +192,20 @@ export async function generateFiles(
     });
 
     insertAfterOccurrences(outputDir, ocurrances);
+
+    /**
+     * If one file haves 2 or more ocurrances, use this other array
+     */
+    const sameFileOcurrences: Ocurrances[] = [];
+
+    if (validation === 'Date') {
+      sameFileOcurrences.push({
+        searchText: '/*entitypresuper*/',
+        textToInsert: `props.${parsedKey} &&= new Date(props.${parsedKey});`,
+      });
+    }
+
+    insertAfterOccurrences(outputDir, sameFileOcurrences);
   }
 
   console.log(
@@ -182,28 +213,67 @@ export async function generateFiles(
     `✅  The files for the entity ${name} were successfully created.\n\n🛠️   Now the files are being formatted by prettier, builded, and tested.\n\n`,
   );
 
-  const tasks = new Listr([
+  const tasksArr = [
     {
-      title: '🛠️  Formatting and Building. 🛠️\n',
-      task: () => formatAndBuild(),
+      title: '🛠️  Formatting and Building Core. 🛠️\n',
+      task: () => formatAndBuild('core'),
     },
     {
       title: '✅ Testing new files. ✅\n\n',
       task: async () => testNewFiles(name),
     },
-  ]);
+  ];
 
-  await tasks.run().catch((err) => {
-    console.error(err);
-  });
+  const tasks = new Listr(tasksArr);
 
-  console.log(
-    '\x1b[1m%s\x1b[0m',
-    `🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆
+  await tasks
+    .run()
+    .then(async () => {
+      if (nestPath) {
+        await generateNestFiles(name, nestDir, nestPath, props);
+
+        new Listr([
+          {
+            title: '🛠️  Formatting and Building NestJS. 🛠️\n',
+            task: () => formatAndBuild('nest'),
+          },
+          {
+            title: '✅  Testing New NestJS Files. ✅\n',
+            task: () => testNewNestFiles(name),
+          },
+        ])
+          .run()
+          .finally(() => {
+            console.log(
+              '\x1b[1m%s\x1b[0m',
+              `🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆
 🎆                                                               \u2009🎆
 🎆       🚀 The entity generator has finished it process. 🚀     \u2009🎆
 🎆                                                               \u2009🎆
 🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆`,
-  );
-  process.exit();
+            );
+          });
+      }
+    })
+    .catch((err) => {
+      console.log(`❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌
+❌                                                               \u2009❌
+❌          😥    The entity generator had an error.  😥         \u2009❌
+❌                                                               \u2009❌
+❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌`);
+      console.error(err);
+    })
+    .finally(() => {
+      if (!nestPath) {
+        console.log(
+          '\x1b[1m%s\x1b[0m',
+          `🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆
+🎆                                                               \u2009🎆
+🎆       🚀 The entity generator has finished it process. 🚀     \u2009🎆
+🎆                                                               \u2009🎆
+🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆`,
+        );
+        process.exit();
+      }
+    });
 }

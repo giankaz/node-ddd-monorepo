@@ -15,7 +15,7 @@ files.forEach((file) => {
 
   const obj = JSON.parse(data.toString());
   if (lang === 'en') {
-    JsonToTs(obj, { rootName: 'Translations' }).forEach((type) => {
+    JsonToTs(obj, { rootName: 'ITranslations' }).forEach((type) => {
       typesToWrite += `export ${type.toString()}\n`;
     });
     en = data.toString();
@@ -40,17 +40,29 @@ if (enTranslations.length !== ptTranslations.length) {
   );
 }
 
-const objectsToWrite = `import { Translations } from './types';
+let tranlationEnum = ``
+
+enTranslations.forEach((trans) => {
+  tranlationEnum += `${trans} = '${trans}', \n`
+})
+
+
+const objectsToWrite = `export * from './translate';
+import { ITranslations } from './types';
 export type AppLanguages = 'pt' | 'en';
 
-export type Langs = {
-  [key in AppLanguages]: Translations;
+export type ILanguages = {
+  [key in AppLanguages]: ITranslations;
 };
 
-export const languages: Langs = {
+export const languages: ILanguages = {
   en: ${en},
   pt: ${pt},
 };
+
+export enum Translations {
+  ${tranlationEnum}
+}
 `;
 
 fs.writeFileSync(path.resolve(__dirname, 'src', 'types.ts'), typesToWrite, 'utf8');

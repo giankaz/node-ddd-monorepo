@@ -1,13 +1,14 @@
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { CommonEntityModel, Entity } from '../../entities';
+import { Entity } from '../../entities';
 import { ValidatorFields } from '../validator-fields';
 import * as classValidator from 'class-validator';
+import { CommonEntityValidator } from '../common.validator';
 
 class StubValidatorFields extends ValidatorFields<{
   field: string;
 }> {}
 
-class StubEntityModel extends CommonEntityModel {
+class StubEntityValidator extends CommonEntityValidator {
   @IsString()
   @IsNotEmpty()
   stub: string;
@@ -15,15 +16,18 @@ class StubEntityModel extends CommonEntityModel {
   @IsNumber()
   price: number;
 
-  constructor(props: StubEntityModel) {
+  constructor(props: StubEntityValidator) {
     super(props);
     Object.assign(this, props);
   }
 }
 
-class StubEntity extends Entity<StubEntityModel> implements StubEntityModel {
-  constructor(props: StubEntityModel) {
-    super(props, StubEntityModel);
+class StubEntity
+  extends Entity<StubEntityValidator>
+  implements StubEntityValidator
+{
+  constructor(props: StubEntityValidator) {
+    super(props, StubEntityValidator);
   }
 
   get stub() {
@@ -51,7 +55,8 @@ describe('ValidatorFields Tests', () => {
     expect(validator.validate(null)).toBeFalsy();
     expect(spyValidateSync).toHaveBeenCalled();
     expect(validator.validatedData).toBeNull();
-    expect(validator.errors).toStrictEqual({ field: ['some error'] });
+    expect(validator.errors?.context).toStrictEqual('field');
+    expect(validator.errors?.message).toStrictEqual('some error');
   });
 
   it('should validate without errors', () => {
@@ -72,21 +77,4 @@ describe('ValidatorFields Tests', () => {
 
     expect(entity.id).toBeDefined();
   });
-
-  // it('should throw error on invalid entity', () => {
-  //   expect(() => {
-  //     new StubEntity({} as unknown as StubEntityModel);
-  //   }).toThrowError();
-  // });
-
-  // it('should throw error on invalid entity update on common and other props', () => {
-  //   const entity = new StubEntity({
-  //     price: 10,
-  //     stub: 'stub',
-  //   });
-
-  //   expect(() => {
-  //     entity.changeName(354543 as unknown as string);
-  //   }).toThrowError();
-  // });
 });

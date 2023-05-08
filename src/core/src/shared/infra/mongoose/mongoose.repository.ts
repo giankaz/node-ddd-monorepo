@@ -8,20 +8,20 @@ import {
   SearchResult,
 } from '../../domain';
 
-interface MongooseRepositoryConstructor<Model> {
+interface MongooseRepositoryConstructor<Props> {
   connection?: Connection;
   modelName: string;
-  Schema: mongoose.Schema<Model, Document>;
+  Schema: mongoose.Schema<Props, Document>;
   collectionName: string;
 }
 
 export abstract class MongooseRepository<
-  Model,
-  E extends Entity<Model>,
+  Props,
+  E extends Entity<Props>,
   Fields extends string,
-> implements RepositoryInterface<Model, E, Fields>
+> implements RepositoryInterface<Props, E, Fields>
 {
-  private model: mongoose.Model<Model>;
+  private model: mongoose.Model<Props>;
 
   abstract sortableFields: Fields[];
   abstract searchableFields: Fields[];
@@ -32,15 +32,15 @@ export abstract class MongooseRepository<
     modelName,
     Schema,
     connection,
-  }: MongooseRepositoryConstructor<Model>) {
+  }: MongooseRepositoryConstructor<Props>) {
     if (connection) {
-      this.model = connection.model<Model>(modelName, Schema, collectionName);
+      this.model = connection.model<Props>(modelName, Schema, collectionName);
     } else {
-      this.model = mongoose.model<Model>(modelName, Schema, collectionName);
+      this.model = mongoose.model<Props>(modelName, Schema, collectionName);
     }
   }
 
-  abstract toEntity(model: Model): E;
+  abstract toEntity(model: Props): E;
 
   async insert(entity: E): Promise<E> {
     const model = new this.model({ ...entity.toJSON() });
@@ -59,13 +59,17 @@ export abstract class MongooseRepository<
   async findById(id: string): Promise<E> {
     const model = await this.model.findOne({ _id: String(id) }).exec();
 
+    if (!model) return;
+
     return this.toEntity(model);
   }
 
-  async findByField(field: keyof Model, value: unknown): Promise<E> {
+  async findByField(field: keyof Props, value: unknown): Promise<E> {
     const model = await this.model.findOne({
       [field]: value,
-    } as FilterQuery<Model>);
+    } as FilterQuery<Props>);
+
+    if (!model) return;
 
     return this.toEntity(model);
   }
@@ -76,7 +80,7 @@ export abstract class MongooseRepository<
 
   public async search(
     props: SearchParams<Fields>,
-  ): Promise<SearchResult<Model, E, Fields>> {
+  ): Promise<SearchResult<Props, E, Fields>> {
     const parsedParams = new MongooseParseSearchParams().parse<Fields>({
       params: props,
       filterableFields: this.filterableFields,
@@ -111,24 +115,55 @@ export abstract class MongooseRepository<
     const model = await this.model.findOneAndUpdate(
       { _id: String(entity.id) },
       entity.toJSON(),
+      { new: true },
     );
+
+    if (!model) return;
 
     return this.toEntity(model);
   }
 
-  async delete(id: string): Promise<void> {
-    await this.model.findOneAndDelete({ _id: String(id) });
+  async delete(id: string): Promise<boolean> {
+    const result = await this.model.findOneAndDelete({ _id: String(id) });
+    if (!result) {
+      return;
+    }
+    return true;
   }
 
-  async activate(id: string): Promise<void> {
-    await this.model.findByIdAndUpdate(id, { status: CommonStatus.ACTIVE });
+  async activate(id: string): Promise<E> {
+    const result = await this.model.findOneAndUpdate(
+      { _id: String(id) },
+      {
+        status: CommonStatus.ACTIVE,
+      },
+      { new: true },
+    );
+    if (!result) return;
+    return this.toEntity(result);
   }
 
-  async inactivate(id: string): Promise<void> {
-    await this.model.findByIdAndUpdate(id, { status: CommonStatus.INACTIVE });
+  async inactivate(id: string): Promise<E> {
+    const result = await this.model.findOneAndUpdate(
+      { _id: String(id) },
+      {
+        status: CommonStatus.INACTIVE,
+      },
+      { new: true },
+    );
+    if (!result) return;
+    return this.toEntity(result);
   }
 
-  async softDelete(id: string): Promise<void> {
-    await this.model.findByIdAndUpdate(id, { status: CommonStatus.DELETED });
+  async softDelete(id: string): Promise<E> {
+    const result = await this.model.findOneAndUpdate(
+      { _id: String(id) },
+      {
+        status: CommonStatus.DELETED,
+      },
+      { new: true },
+    );
+    if (!result) return;
+    return this.toEntity(result);
   }
 }

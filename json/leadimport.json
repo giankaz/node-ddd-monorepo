@@ -1,0 +1,6 @@
+{
+  "company_id": "string",
+  "account_id": "string",
+  "contacts_total": "number",
+  "emails_total": "number"
+}

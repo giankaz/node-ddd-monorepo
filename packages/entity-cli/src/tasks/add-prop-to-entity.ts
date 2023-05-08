@@ -10,8 +10,13 @@ import { formatAndBuild } from './format-and-build';
 import { testNewFiles } from './test-new-files';
 import { parseObjectInterfaces } from '../parsers/object-interfaces.parser';
 import { PropsTypes } from '../models/types';
+import { addPropToNest } from './add-prop-to-nest';
 
-export async function addPropToEntity(path: string, props: Props) {
+export async function addPropToEntity(
+  path: string,
+  props: Props,
+  nestPath?: string,
+) {
   const currentDir = path.split('/').slice(0, -1).join('/');
   const dirArr = currentDir.split('/');
   const name = dirArr[dirArr.length - 1];
@@ -89,10 +94,24 @@ export async function addPropToEntity(path: string, props: Props) {
       getter = `get ${parsedKey}():${parsedType}{ return this.props?.${parsedKey}};\n\n`;
     }
 
-    let setter = `set ${parsedKey}(new${keyUppercaseFirstParsed}: ${parsedType}){ this.props.${parsedKey}=new${keyUppercaseFirstParsed};this.update()};\n\n`;
+    let setter = `set ${parsedKey}(new${keyUppercaseFirstParsed}: ${parsedType}){ 
+      this.props.${parsedKey}= ${
+      validation === 'Date'
+        ? `new Date(new${keyUppercaseFirstParsed})`
+        : `new${keyUppercaseFirstParsed}`
+    };
+      this.update()
+    };\n`;
 
     if (isOptional) {
-      setter = `set ${parsedKey}(new${keyUppercaseFirstParsed}:${parsedType}|null){this.props.${parsedKey}=new${keyUppercaseFirstParsed};this.update()};\n\n`;
+      setter = `set ${parsedKey}(new${keyUppercaseFirstParsed}:${parsedType}|null){
+        this.props.${parsedKey}= ${
+        validation === 'Date'
+          ? `new Date(new${keyUppercaseFirstParsed})`
+          : `new${keyUppercaseFirstParsed}`
+      };
+        this.update()
+      };\n`;
     }
 
     ocurrances.push({
@@ -157,7 +176,7 @@ export async function addPropToEntity(path: string, props: Props) {
 
   console.log(
     '\x1b[1m%s\x1b[0m',
-    `✅  The files for the entity ${currentDir} were successfully created.\n\n🛠️   Now the files are being formatted by prettier, builded, and tested.\n\n`,
+    `✅  The files for the entity ${name} were successfully updated.\n\n🛠️   Now the files are being formatted by prettier, builded, and tested.\n\n`,
   );
 
   const tasks = new Listr([
@@ -171,17 +190,50 @@ export async function addPropToEntity(path: string, props: Props) {
     },
   ]);
 
-  await tasks.run().catch((err) => {
-    console.error(err);
-  });
+  await tasks
+    .run()
+    .then(async () => {
+      if (nestPath) {
+        await addPropToNest(name, props, nestPath);
 
-  console.log(
-    '\x1b[1m%s\x1b[0m',
-    `🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆
+        new Listr([
+          {
+            title: '🛠️  Formatting and Building Nest. 🛠️\n',
+            task: () => formatAndBuild('nest'),
+          },
+        ])
+          .run()
+          .finally(() => {
+            console.log(
+              '\x1b[1m%s\x1b[0m',
+              `🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆
 🎆                                                               \u2009🎆
 🎆       🚀 The entity generator has finished it process. 🚀     \u2009🎆
 🎆                                                               \u2009🎆
 🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆`,
-  );
-  process.exit();
+            );
+          });
+      }
+    })
+    .catch((err) => {
+      `❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌
+❌                                                               \u2009❌
+❌          😥    The entity generator had an error.  😥         \u2009❌
+❌                                                               \u2009❌
+❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌`;
+      console.error(err);
+    })
+    .finally(() => {
+      if (!nestPath) {
+        console.log(
+          '\x1b[1m%s\x1b[0m',
+          `🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆
+🎆                                                               \u2009🎆
+🎆       🚀 The entity generator has finished it process. 🚀     \u2009🎆
+🎆                                                               \u2009🎆
+🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆🎆`,
+        );
+        process.exit();
+      }
+    });
 }

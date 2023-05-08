@@ -1,0 +1,6 @@
+{
+    "field_type": "string",
+    "variable": "string",
+    "category": "string[]",
+    "validated": "boolean"
+}

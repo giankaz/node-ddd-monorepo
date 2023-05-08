@@ -1,4 +1,9 @@
 {
-  "sent": "sent",
-  "test": "test"
+  "example": "example",
+  "the_example": "the example",
+  "not_found_error_message": "%s was not found",
+  "not_found_error_solution": "check if the %s was succesfully created",
+  "status_must_be_active_inactive_deleted": "check if the status is active, inactive or deleted",
+  "x_is_required": "%s is required",
+  "name": "name"
 }

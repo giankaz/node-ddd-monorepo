@@ -1,0 +1,12 @@
+{
+  "activity_type?": "string",
+  "origin_space": "string",
+  "lead_id": "string",
+  "document?": "string",
+  "account_id": "string",
+  "story_points": "number",
+  "data": {
+    "data_type": "string",
+    "data": "string"
+  }
+}

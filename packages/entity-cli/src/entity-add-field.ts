@@ -8,7 +8,11 @@ import { keyValidator } from './utils/keyValidator';
 
 const props: Props = {};
 
-export async function entityAddField(path: string, jsonPath?: string) {
+export async function entityAddField(
+  path: string,
+  jsonPath?: string,
+  nestPath?: string,
+) {
   (async () => {
     if (!path) {
       const response = await prompts({
@@ -22,11 +26,31 @@ export async function entityAddField(path: string, jsonPath?: string) {
 
     if (!fs.existsSync(path)) {
       console.log('❗ Entity not found on given path ❗\n');
-    } else {
-      (async () => await addField(path, jsonPath))();
+      process.exit();
     }
 
-    async function addField(path: string, jsonPath?: string) {
+    if (!nestPath) {
+      const response = await prompts({
+        type: 'text',
+        name: 'nestDirPath',
+        message: '🖊️  Enter the NestJs Module Path: ',
+      });
+
+      nestPath = response.nestDirPath;
+    }
+
+    if (!fs.existsSync(String(nestPath))) {
+      console.log('❗ NestJS Module not found on given path ❗\n');
+      process.exit();
+    }
+
+    (async () => await addField(path, jsonPath, nestPath))();
+
+    async function addField(
+      path: string,
+      jsonPath?: string,
+      nestPath?: string,
+    ) {
       async function prompt() {
         (async () => {
           const propsResponse = await prompts({
@@ -39,7 +63,7 @@ export async function entityAddField(path: string, jsonPath?: string) {
           const prop = propsResponse.prop;
 
           if (prop === 's') {
-            await addPropToEntity(path, props);
+            await addPropToEntity(path, props, nestPath);
             return;
           }
 
@@ -47,7 +71,7 @@ export async function entityAddField(path: string, jsonPath?: string) {
             process.exit();
           }
 
-          if (!keyValidator(prop)) {
+          if (!keyValidator(prop, props)) {
             return await prompt();
           }
 
@@ -102,7 +126,7 @@ export async function entityAddField(path: string, jsonPath?: string) {
                     process.exit();
                   }
 
-                  if (!keyValidator(subprop)) {
+                  if (!keyValidator(subprop, obj)) {
                     return await promptSubprop();
                   }
 
@@ -137,7 +161,7 @@ export async function entityAddField(path: string, jsonPath?: string) {
         })();
       }
       if (jsonPath) {
-        await jsonAddFieldParser(path, jsonPath);
+        await jsonAddFieldParser(path, jsonPath, nestPath);
       } else {
         await prompt();
       }

@@ -1,9 +1,13 @@
 import { execSync } from 'child_process';
 
-export function formatAndBuild() {
+export function formatAndBuild(pkg?: 'core' | 'nest') {
   new Promise((res, reject) => {
     try {
-      execSync(`cd ${process.cwd()} && pnpm core:build`);
+      if (pkg === 'nest') {
+        execSync(`cd ${process.cwd()} && pnpm build`);
+      } else {
+        execSync(`cd ${process.cwd()} && pnpm core:build`);
+      }
       res('ok');
     } catch (err) {
       reject(err);

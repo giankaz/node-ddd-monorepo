@@ -3,8 +3,6 @@ import {
   FilterOperators,
   ParseSearchParams,
   SearchParams,
-  CommonEntityModel,
-  Entity,
 } from '../../../../domain';
 import { MongooseParseSearchParams } from '../mongoose-parse-search-params';
 

@@ -1,5 +1,4 @@
 import { debug, error } from 'console';
-import kleur from 'kleur';
 
 interface IErrorLogger {
   location: string;
@@ -21,34 +20,32 @@ export function errorLogger({
   const dateString = new Date().toLocaleString();
   const msg = `Error: ${context}`;
   const bars = '*'.repeat(size);
-  const ctx = kleur.red(
-    `
+  const ctx = `
 ${bars}
 
-${kleur.underline(msg)}
+${msg}
 
 ${dateString}
 
 ${bars}
 
-${kleur.underline(`Message:`)}
+${`Message:`}
 
 ${message}
 
-${kleur.underline(`Solution:`)}
+${`Solution:`}
 
 ${solution}
 
-${kleur.underline(`Error Location:`)}
+${`Error Location:`}
     
 ${location}
 
 ${bars}
 
-`,
-  );
+`;
   debug(ctx);
-  debug(kleur.underline().magenta('StackTrace:\n\n'));
+  debug('StackTrace:\n\n');
   error(err);
   debug(ctx);
 }

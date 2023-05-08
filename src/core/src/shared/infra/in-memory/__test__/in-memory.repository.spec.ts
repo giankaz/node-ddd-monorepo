@@ -1,20 +1,20 @@
 import { IsNumber } from 'class-validator';
-import { CommonEntityModel, CoreError, Entity } from '../../../domain';
+import { CommonEntityValidator, Entity } from '../../../domain';
 import { InMemoryRepository } from '../in-memory.repository';
 
-class StubEntityModel extends CommonEntityModel {
+class StubEntityValidator extends CommonEntityValidator {
   @IsNumber()
   price: number;
 
-  constructor(props: StubEntityModel) {
+  constructor(props: StubEntityValidator) {
     super(props);
     Object.assign(this, props);
   }
 }
 
-class StubEntity extends Entity<StubEntityModel> {
-  constructor(props: StubEntityModel) {
-    super(props, StubEntityModel);
+class StubEntity extends Entity<StubEntityValidator> {
+  constructor(props: StubEntityValidator) {
+    super(props, StubEntityValidator);
   }
 
   get price(): number {
@@ -23,11 +23,13 @@ class StubEntity extends Entity<StubEntityModel> {
 }
 
 type StubFields = {} & Partial<
-  keyof Pick<StubEntityModel, keyof StubEntityModel>
+  keyof Pick<StubEntityValidator, keyof StubEntityValidator>
 >;
 
+type StubEntityProps = Pick<StubEntityValidator, keyof StubEntityValidator>;
+
 class StubInMemoryRepository extends InMemoryRepository<
-  StubEntityModel,
+  StubEntityProps,
   StubEntity,
   StubFields
 > {
@@ -45,20 +47,9 @@ describe('InMemoryRepository Tests', () => {
     expect(entity.toJSON()).toStrictEqual(repository.items[0].toJSON());
   });
 
-  it('should throws error when entity not found', async () => {
-    await expect(repository.findById('fake id')).rejects.toThrow(
-      new CoreError({
-        message: 'item not found',
-      }),
-    );
-
-    await expect(
-      repository.findById('9366b7dc-2d71-4799-b91c-c64adb205104'),
-    ).rejects.toThrow(
-      new CoreError({
-        message: 'item not found',
-      }),
-    );
+  it('should return undefined when not found', async () => {
+    const result = await repository.findById('fake id');
+    expect(result).toBeUndefined();
   });
 
   it('should finds a entity by id', async () => {
@@ -81,13 +72,10 @@ describe('InMemoryRepository Tests', () => {
     expect(entities).toStrictEqual([entity]);
   });
 
-  it('should throws error on update when entity not found', () => {
+  it('should return undefined trying to update entity', async () => {
     const entity = new StubEntity({ price: 5, name: 'name value' });
-    expect(repository.update(entity)).rejects.toThrow(
-      new CoreError({
-        message: 'item not found',
-      }),
-    );
+    const update = await repository.update(entity);
+    expect(update).toBeUndefined();
   });
 
   it('should updates an entity', async () => {
@@ -103,20 +91,10 @@ describe('InMemoryRepository Tests', () => {
     expect(entityUpdated.toJSON()).toStrictEqual(repository.items[0].toJSON());
   });
 
-  it('should throws error on delete when entity not found', () => {
-    expect(repository.delete('fake id')).rejects.toThrow(
-      new CoreError({
-        message: 'item not found',
-      }),
-    );
+  it('should return undefined when entity not found', async () => {
+    const result = await repository.delete('fake id');
 
-    expect(
-      repository.delete('9366b7dc-2d71-4799-b91c-c64adb205104'),
-    ).rejects.toThrow(
-      new CoreError({
-        message: 'item not found',
-      }),
-    );
+    expect(result).toBeUndefined();
   });
 
   it('should deletes an entity', async () => {

@@ -1,0 +1,7 @@
+{
+  "lead_count": "number",
+  "email": "string",
+  "phone": "string",
+  "document?": "string",
+  "account_id": "string"
+}

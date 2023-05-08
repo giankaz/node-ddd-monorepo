@@ -1,12 +1,12 @@
 import { Entity } from '../entity';
 import {
-  CommonEntityModel,
+  CommonEntityValidator,
   CommonStatus,
   UniqueEntityId,
 } from '../../../domain';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-class StubEntityModel extends CommonEntityModel {
+class StubEntityValidator extends CommonEntityValidator {
   @IsString()
   @IsNotEmpty()
   stub: string;
@@ -14,15 +14,15 @@ class StubEntityModel extends CommonEntityModel {
   @IsNumber()
   price: number;
 
-  constructor(props: StubEntityModel) {
+  constructor(props: StubEntityValidator) {
     super(props);
     Object.assign(this, props);
   }
 }
 
-class StubEntity extends Entity<StubEntityModel> {
-  constructor(props: StubEntityModel) {
-    super(props, StubEntityModel);
+class StubEntity extends Entity<StubEntityValidator> {
+  constructor(props: StubEntityValidator) {
+    super(props, StubEntityValidator);
   }
 }
 
@@ -53,7 +53,7 @@ describe('Entity Test', () => {
   it('should create being able to pass the common fields', async () => {
     const fake_id = new UniqueEntityId().value;
     const mockDate = new Date('2000-10-10');
-    const mockCommon: CommonEntityModel = {
+    const mockCommon: CommonEntityValidator = {
       id: fake_id,
       name: 'name',
       status: CommonStatus.INACTIVE,

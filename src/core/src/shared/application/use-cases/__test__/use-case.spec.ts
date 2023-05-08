@@ -1,5 +1,4 @@
 import { DefaultUseCase, UseCaseOptions } from '../';
-import { languages } from 'translation';
 import { CoreError } from '../../../domain';
 namespace MockUseCase {
   type Input = {
@@ -16,8 +15,8 @@ namespace MockUseCase {
     async useCase(input: Input, options: UseCaseOptions): Promise<Output> {
       if (input.isThrow)
         throw new CoreError({
-          message: languages[options.language].sent,
-          solution: languages[options.language].sent,
+          message: 'test',
+          solution: 'test',
         });
       return {
         id: input.id,
@@ -50,8 +49,8 @@ describe('UseCase Unit Tests', () => {
       });
     }).rejects.toThrowError(
       new CoreError({
-        message: languages.en.sent,
-        solution: languages.en.sent,
+        message: 'test',
+        solution: 'test',
       }),
     );
 
@@ -62,8 +61,8 @@ describe('UseCase Unit Tests', () => {
       });
     }).rejects.toThrowError(
       new CoreError({
-        message: languages.pt.sent,
-        solution: languages.pt.sent,
+        message: 'test',
+        solution: 'test',
       }),
     );
   });

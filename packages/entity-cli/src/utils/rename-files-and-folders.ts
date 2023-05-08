@@ -7,8 +7,11 @@ export function renameFilesAndFolders(dir: string, replacer: string) {
     if (fs.statSync(filePath).isDirectory()) {
       renameFilesAndFolders(filePath, replacer);
     }
-    if (file.includes('example')) {
-      const newFilePath = path.join(dir, file.replace(/example/g, replacer));
+    if (file.includes('xxxxeclixxxx')) {
+      const newFilePath = path.join(
+        dir,
+        file.replace(/xxxxeclixxxx/gi, replacer),
+      );
       fs.renameSync(filePath, newFilePath);
     }
   });

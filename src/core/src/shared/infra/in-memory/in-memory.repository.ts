@@ -11,10 +11,10 @@ import {
 } from '../../domain';
 
 export abstract class InMemoryRepository<
-  Model,
-  E extends Entity<Model>,
+  Props,
+  E extends Entity<Props>,
   Fields extends string,
-> implements RepositoryInterface<Model, E, Fields>
+> implements RepositoryInterface<Props, E, Fields>
 {
   items: E[] = [];
   abstract sortableFields: Fields[];
@@ -23,7 +23,7 @@ export abstract class InMemoryRepository<
 
   async search(
     props: SearchParams<Fields>,
-  ): Promise<SearchResult<Model, E, Fields>> {
+  ): Promise<SearchResult<Props, E, Fields>> {
     const itemsFiltered =
       !props ||
       (!props.defaultSearch &&
@@ -74,7 +74,7 @@ export abstract class InMemoryRepository<
         )
       : [];
 
-    return FilterInMemory.parse<Model, E, Fields>(items, filter, {
+    return FilterInMemory.parse<Props, E, Fields>(items, filter, {
       searchableFields: this.searchableFields,
       defaultSearch,
     });
@@ -128,7 +128,7 @@ export abstract class InMemoryRepository<
     return this._get(_id);
   }
 
-  async findByField(field: keyof Model, value: unknown): Promise<E> {
+  async findByField(field: keyof Props, value: unknown): Promise<E> {
     return this.items.find((item) => item.toJSON()[field] === value);
   }
 
@@ -137,44 +137,57 @@ export abstract class InMemoryRepository<
   }
 
   async update(entity: E): Promise<E> {
-    await this._get(entity.id);
+    const foundEntity = await this._get(entity.id);
+    if (!foundEntity) return;
     const indexFound = this.items.findIndex((i) => i.id === entity.id);
     this.items[indexFound] = entity;
     return entity;
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string): Promise<boolean> {
     const _id = `${id}`;
-    await this._get(_id);
+    const item = await this._get(_id);
+    if (!item) {
+      return;
+    }
     const indexFound = this.items.findIndex((i) => i.id === _id);
     this.items.splice(indexFound, 1);
+    return true;
   }
 
-  async activate(id: string): Promise<void> {
+  async activate(id: string): Promise<E> {
     const _id = `${id}`;
     const entity = await this._get(_id);
+    if (!entity) {
+      return;
+    }
     entity.activate();
+    return entity;
   }
 
-  async inactivate(id: string): Promise<void> {
+  async inactivate(id: string): Promise<E> {
     const _id = `${id}`;
     const entity = await this._get(_id);
+    if (!entity) {
+      return;
+    }
     entity.inactivate();
+    return entity;
   }
 
-  async softDelete(id: string): Promise<void> {
+  async softDelete(id: string): Promise<E> {
     const _id = `${id}`;
     const entity = await this._get(_id);
+    if (!entity) {
+      return;
+    }
     entity.softDelete();
+    return entity;
   }
 
   protected async _get(id: string): Promise<E> {
     const item = this.items.find((i) => i.id === id);
-    if (!item) {
-      throw new CoreError({
-        message: 'item not found',
-      });
-    }
+    if (!item) return;
     return item;
   }
 }

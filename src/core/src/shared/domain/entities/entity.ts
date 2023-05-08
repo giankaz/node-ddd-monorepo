@@ -1,60 +1,26 @@
-import { IsDate, IsEnum, IsOptional, IsString } from 'class-validator';
-import { ValidatorFields } from '../validators';
+import {
+  CommonEntityValidator,
+  CommonStatus,
+  ValidatorFactory,
+} from '../validators';
 import { ValueObject, UniqueEntityId } from '../value-objects';
 import { CoreError } from '../errors';
-import { classValidatorErrorParse } from '../../utils';
 
-export enum CommonStatus {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-  DELETED = 'DELETED',
-}
-
-export class CommonEntityModel {
-  @IsString()
-  @IsOptional()
-  id?: string;
-
-  @IsString()
-  @IsOptional()
-  name?: string;
-
-  @IsEnum(CommonStatus)
-  @IsOptional()
-  status?: CommonStatus;
-
-  @IsDate()
-  @IsOptional()
-  created_at?: Date;
-
-  @IsDate()
-  @IsOptional()
-  updated_at?: Date | null;
-
-  constructor(props: CommonEntityModel) {
-    for (const key in props) {
-      if (key in CommonEntityModel) {
-        Object.assign(this, props);
-      }
-    }
-  }
-}
-
-export abstract class Entity<Model extends CommonEntityModel> {
+export abstract class Entity<Validator extends CommonEntityValidator> {
   public readonly uniqueEntityId: UniqueEntityId;
 
   constructor(
     /**
      * All the entity props
-     * @param {Model}
+     * @param {Validator}
      */
-    public readonly props: Model,
+    public readonly props: Validator,
 
     /**
-     * Pass the Class Model of the entity
-     * @param {Model}
+     * Pass the Class Validator of the entity
+     * @param {Validator}
      */
-    private readonly ClassModel: { new (props: Model): Model },
+    private readonly ClassValidator: { new (props: Validator): Validator },
   ) {
     this.uniqueEntityId = props?.id
       ? new UniqueEntityId(props.id)
@@ -62,11 +28,11 @@ export abstract class Entity<Model extends CommonEntityModel> {
 
     this.props = {
       ...props,
-      created_at: props?.created_at || new Date(),
+      created_at: props?.created_at ? new Date(props.created_at) : new Date(),
       id: this.uniqueEntityId.value,
       name: props?.name,
       status: props?.status || CommonStatus.ACTIVE,
-      updated_at: props?.updated_at || null,
+      updated_at: props?.updated_at ? new Date(props.updated_at) : null,
     };
 
     this.validate();
@@ -98,14 +64,14 @@ export abstract class Entity<Model extends CommonEntityModel> {
   }
 
   public validate(): boolean {
-    const validatorProps = new ValidatorFields();
+    const validatorProps = ValidatorFactory.create<Validator>();
     const isValidProps = validatorProps.validate(
-      new this.ClassModel(this.props),
+      new this.ClassValidator(this.props),
     );
-
     if (!isValidProps) {
       throw new CoreError({
-        message: classValidatorErrorParse(validatorProps.errors),
+        message: validatorProps.errors.message,
+        context: validatorProps.errors.context,
       });
     }
 
@@ -138,7 +104,7 @@ export abstract class Entity<Model extends CommonEntityModel> {
 
   public isInactive = () => this.status === CommonStatus.INACTIVE;
 
-  toJSON(): Required<CommonEntityModel & Model> {
+  toJSON(): Required<CommonEntityValidator & Validator> {
     const data = {};
     for (const key of Object.keys(this.props || {})) {
       if (this.props[key] instanceof ValueObject) {
@@ -158,6 +124,6 @@ export abstract class Entity<Model extends CommonEntityModel> {
         id: this.id,
         ...data,
       }),
-    ) as Required<CommonEntityModel & Model>;
+    ) as Required<CommonEntityValidator & Validator>;
   }
 }

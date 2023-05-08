@@ -10,7 +10,7 @@
 
 ## Using it:
 
-To use it as a raw CLI you can run `pnpm ecli gen` followed or not by its flags:
+To use it as a raw CLI you can run `pnpm ecli <cmd>` followed or not by its flags (optional):
 
 - Entity Name:
 
@@ -19,17 +19,17 @@ flags: -n, --name
 Example:
 
 ```bash
-  pnpm ecli gen -n example
+  pnpm ecli <cmd> -n example
 ```
 
-- Output Path:
+- Path:
 
 flags: -p, --path
 
 Example:
 
 ```bash
-  pnpm ecli gen -p ./src/core/src
+  pnpm ecli <cmd> -p ./src/core/src
 ```
 
 - Json Path:
@@ -41,10 +41,26 @@ flags: -j, --json
 Example:
 
 ```bash
-  pnpm ecli gen -j ./sample-entity.json
+  pnpm ecli <cmd> -j ./json/sample-entity.json
 ```
 
 OBS: You can chain flags.
+
+### Generating Entity:
+
+Example:
+
+```bash
+  pnpm ecli gen -n example
+```
+
+### Adding to Entity:
+
+Example:
+
+```bash
+  pnpm ecli add -p ./src/core/src/example
+```
 
 ### Running as a pnpm pre-built script:
 

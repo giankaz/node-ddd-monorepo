@@ -1,6 +1,7 @@
 import { javascriptTypescriptReservedKeys } from '../models/javascriptTypescriptNodeReservedKeys';
+import { Props } from '../models/props';
 
-export function keyValidator(prop: string, withExit = false) {
+export function keyValidator(prop: string, props?: Props, withExit = false) {
   if (!prop) {
     console.log('\x1b[1m%s\x1b[0m', ' ❗ Missing or undefined key. ❗ \n');
     if (withExit) {
@@ -24,6 +25,17 @@ export function keyValidator(prop: string, withExit = false) {
     console.log(
       '\x1b[1m%s\x1b[0m',
       ` ❗ This word: " ${prop} " is a reserved javascript/typescript/nodejs key word ❗ \n`,
+    );
+    if (withExit) {
+      process.exit();
+    }
+    return false;
+  }
+
+  if (!!props && prop in props) {
+    console.log(
+      '\x1b[1m%s\x1b[0m',
+      ` ❗ This word: " ${prop} " is already on your entity ❗ \n`,
     );
     if (withExit) {
       process.exit();

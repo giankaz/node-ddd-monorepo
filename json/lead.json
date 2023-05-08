@@ -1,0 +1,25 @@
+{
+  "email": "string",
+  "birth_date": "string",
+  "story_points": "number",
+  "mobile_phone": "string",
+  "phone": "string",
+  "active?": "boolean",
+  "document": "string",
+  "opportunity": "boolean",
+  "account_id": "string",
+  "company_id?": "string",
+  "import_id?": "string",
+  "user_id": "string",
+  "state": "string",
+  "origin": "string",
+  "address": {
+    "cep": "string",
+    "country": "string",
+    "state": "string",
+    "city": "string",
+    "neighborhood": "string",
+    "street": "string",
+    "house_number": "string"
+  }
+}

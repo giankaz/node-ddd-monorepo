@@ -19,27 +19,33 @@ export async function jsonGenParser(
   name: string,
   assetDir: string,
   outputDir: string,
+  nestDir: string,
+  nestPath?: string,
 ) {
   try {
     const data = await fs.readFile(path);
     const jsonData = JSON.parse(data.toString());
     loopNestedObject(jsonData, (key: string) => {
-      keyValidator(key, true);
+      keyValidator(key, undefined, true);
     });
-    await generateFiles(name, assetDir, outputDir, jsonData);
+    await generateFiles(name, assetDir, outputDir, jsonData, nestDir, nestPath);
   } catch (err) {
     console.error(err);
   }
 }
 
-export async function jsonAddFieldParser(path: string, jsonPath: string) {
+export async function jsonAddFieldParser(
+  path: string,
+  jsonPath: string,
+  nestPath?: string,
+) {
   try {
     const data = await fs.readFile(jsonPath);
     const jsonData = JSON.parse(data.toString());
     loopNestedObject(jsonData, (key: string) => {
-      keyValidator(key, true);
+      keyValidator(key, undefined, true);
     });
-    await addPropToEntity(path, jsonData);
+    await addPropToEntity(path, jsonData, nestPath);
   } catch (err) {
     console.error(err);
   }

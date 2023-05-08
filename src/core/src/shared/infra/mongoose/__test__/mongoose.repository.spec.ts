@@ -4,26 +4,26 @@ import {
   FilterOperators,
   SearchParams,
   Entity,
-  CommonEntityModel,
+  CommonEntityValidator,
   CommonStatus,
 } from '../../../domain';
 import { BaseSchemaFields, MongooseRepository } from '..';
 import { IsNumber } from 'class-validator';
 import { Document, Schema } from 'mongoose';
 
-class StubEntityModel extends CommonEntityModel {
+class StubEntityValidator extends CommonEntityValidator {
   @IsNumber()
   price: number;
 
-  constructor(props: StubEntityModel) {
+  constructor(props: StubEntityValidator) {
     super(props);
     Object.assign(this, props);
   }
 }
 
-class StubEntity extends Entity<StubEntityModel> {
-  constructor(props: StubEntityModel) {
-    super(props, StubEntityModel);
+class StubEntity extends Entity<StubEntityValidator> {
+  constructor(props: StubEntityValidator) {
+    super(props, StubEntityValidator);
   }
 
   get price() {
@@ -35,11 +35,11 @@ class StubEntity extends Entity<StubEntityModel> {
     this.update();
   }
 }
-interface IStubEntity extends StubEntityModel, CommonEntityModel {}
+type StubEntityProps = Pick<StubEntityValidator, keyof StubEntityValidator>;
 
 type Fields = 'name' | 'created_at' | 'id';
 
-const stubSchema = new Schema<IStubEntity, Document>({
+const stubSchema = new Schema<StubEntityProps, Document>({
   ...BaseSchemaFields,
   price: {
     type: Number,
@@ -48,7 +48,7 @@ const stubSchema = new Schema<IStubEntity, Document>({
 });
 
 class StubRepository extends MongooseRepository<
-  IStubEntity,
+  StubEntityProps,
   StubEntity,
   Fields
 > {
@@ -64,7 +64,7 @@ class StubRepository extends MongooseRepository<
     });
   }
 
-  public toEntity(model: IStubEntity): StubEntity {
+  public toEntity(model: StubEntityProps): StubEntity {
     return new StubEntity({
       price: model.price,
       id: model.id,
@@ -339,8 +339,7 @@ describe('mongoose repository tests', () => {
 
     await repository.delete(randomEntity.id);
 
-    expect(async () => {
-      await repository.findById(randomEntity.id);
-    }).rejects.toThrow();
+    const result = await repository.findById(randomEntity.id);
+    expect(result).toBeUndefined();
   });
 });

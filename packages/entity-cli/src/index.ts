@@ -8,9 +8,10 @@ program
   .option('-p, --path <path>', 'Path to output directory')
   .option('-n, --name <name>', 'Entity name')
   .option('-j, --json <json>', 'Path to import props from a json file')
+  .option('--nest <nest>', 'Path to generated NestJS module')
   .action(async (options) => {
-    const { path, name, json } = options;
-    await entityGenerator(name, path, json);
+    const { path, name, json, nest } = options;
+    await entityGenerator(name, path, json, nest);
   });
 
 program
@@ -18,9 +19,10 @@ program
   .description('Add fields to an entity')
   .option('-p, --path <path>', 'Path to the entity directory')
   .option('-j, --json <json>', 'Path to import props from a json file')
+  .option('--nest <nest>', 'Path to generated NestJS module')
   .action(async (options) => {
-    const { path, json } = options;
-    await entityAddField(path, json);
+    const { path, json, nest } = options;
+    await entityAddField(path, json, nest);
   });
 
 program.parse();

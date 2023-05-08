@@ -1,4 +1,4 @@
-import { SearchParams } from './searchable.repository';
+import { SearchParams } from './repository.interface';
 
 export interface ParseSearchParams<Fields extends string> {
   params: SearchParams<Fields>;

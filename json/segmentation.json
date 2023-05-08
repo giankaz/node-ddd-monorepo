@@ -1,0 +1,11 @@
+{
+    "lead_count": "number",
+    "groups": {
+        "field?": "string",
+        "filter": "string",
+        "value": "string"
+    },
+    "filters": {
+        "key": "string"
+    }
+}

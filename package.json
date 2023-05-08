@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "build": "pnpm i; turbo run build; pnpm format",
+    "build": "turbo run build; pnpm format; pnpm i",
     "dev": "turbo run dev",
     "lint": "turbo run lint -- --max-warnings=0",
     "test": "turbo run test",
@@ -10,11 +10,15 @@
     "core:build": "turbo run core#build",
     "core:format": "turbo run core#format",
     "core:test": "turbo run core#test",
+    "nest:build": "turbo run nestjs#build",
     "clear:turbo": "find . -type d -name '.turbo' -print0 | xargs -0 rm -rf",
     "prepare": "husky install",
-    "ecli:build": "pnpm --filter=entity-cli build; pnpm add -D ./packages/entity-cli -w",
+    "trans:build": "turbo run translation#build",
     "g:e": "pnpm ecli gen -p ./src/core/src",
-    "g:e:json": "pnpm ecli gen -p ./src/core/src --json "
+    "g:e:withnest": "pnpm ecli gen -p ./src/core/src --nest ./src/nestjs/src/modules",
+    "g:e:json": "pnpm ecli gen -p ./src/core/src --json ",
+    "g:e:json:withnest": "pnpm ecli gen -p ./src/core/src --nest ./src/nestjs/src/modules --json ",
+    "ecli:build": "pnpm --filter=entity-cli build; pnpm add -D ./packages/entity-cli -w"
   },
   "husky": {
     "hooks": {
@@ -26,13 +30,17 @@
     "@commitlint/cli": "^17.6.1",
     "@commitlint/config-conventional": "^17.6.1",
     "@types/jest": "^29.5.1",
-    "e-cli": "link:packages/eCLI",
+    "create-ts-index": "^1.14.0",
+    "entity-cli": "link:packages/entity-cli",
     "eslint": "^7.32.0",
     "eslint-config-custom": "workspace:*",
     "husky": "^8.0.3",
+    "listr": "^0.14.3",
     "prettier": "^2.5.1",
+    "prettier-plugin-organize-imports": "^3.2.2",
+    "prompts": "^2.4.2",
     "turbo": "latest"
   },
   "packageManager": "pnpm@7.15.0",
-  "name": "ddd-core"
+  "name": "crm"
 }
