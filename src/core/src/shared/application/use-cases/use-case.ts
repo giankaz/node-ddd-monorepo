@@ -1,8 +1,4 @@
-import {
-  AppLanguages,
-  Translations,
-  translate,
-} from '../../../../../../packages/translation_v1/dist';
+import { AppLanguages, Translations, translate } from 'translation';
 import { errorLogger } from '../../utils';
 import { Event } from '../events';
 import { CoreError } from '../../domain';

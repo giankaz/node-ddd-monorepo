@@ -1,4 +1,4 @@
-import { AppLanguages } from '../../../../../packages/translation_v1/dist';
+import { AppLanguages } from 'translation';
 
 export class DateFormatter {
   public static short(date: Date | string, locale: AppLanguages) {

@@ -1,5 +1,5 @@
 import { IsDate, IsEnum, IsOptional, IsString } from 'class-validator';
-import { Translations } from '../../../../../../packages/translation_v1/dist';
+import { Translations } from 'translation';
 
 export enum CommonStatus {
   ACTIVE = 'ACTIVE',
