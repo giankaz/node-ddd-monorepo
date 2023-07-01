@@ -1,63 +1,70 @@
 /* eslint-disable no-case-declarations */
-import { Props } from '../models/props';
+import { IParser } from '../interfaces/parser';
+import { Props } from '../interfaces/props';
 
-export function parseMongo(props: Props) {
-  let mongoschema = '';
-  const entriesProps = Object.entries(props);
+export class MongoParser implements IParser<string> {
+  execute(props: Props): string {
+    let mongoSchema = '';
+    const entriesProps = Object.entries(props);
 
-  entriesProps.forEach(([key, value]) => {
-    let parsedKey = key;
-    let is_subkey_optional = false;
-    const last_char_of_sub_key = key.slice(-1);
-    const required = `required:  ${is_subkey_optional ? 'false' : 'true'}`;
+    entriesProps.forEach(([key, value]) => {
+      let parsedKey = key;
+      let is_sub_key_optional = false;
+      const last_char_of_sub_key = key.slice(-1);
+      const required = `required:  ${is_sub_key_optional ? 'false' : 'true'}`;
 
-    if (last_char_of_sub_key === '?') {
-      is_subkey_optional = true;
-      parsedKey = key.replace('?', '').replace('[]', '');
-    }
-    if (typeof value === 'object') {
-      let subSchema = `${parsedKey}: { 
+      if (last_char_of_sub_key === '?') {
+        is_sub_key_optional = true;
+        parsedKey = key.replace('?', '').replace('[]', '');
+      }
+      if (typeof value === 'object') {
+        let subSchema = `${parsedKey}: { 
         type: {
         `;
-      const schema = parseMongo(value);
-      subSchema += `${schema} },
+        const schema = this.execute(value);
+        subSchema += `${schema} },
       ${required},
       _id: false,
          }, `;
-      mongoschema += `${subSchema}\n`;
-    } else {
-      const schema = mongoSwitchCase(value, parsedKey, is_subkey_optional);
-      mongoschema += `${schema}  `;
-    }
-    mongoschema;
-  });
+        mongoSchema += `${subSchema}\n`;
+      } else {
+        const schema = this.mongoSwitchCase(
+          value,
+          parsedKey,
+          is_sub_key_optional,
+        );
+        mongoSchema += `${schema}  `;
+      }
+      mongoSchema;
+    });
 
-  return mongoschema;
-}
-
-function mongoSwitchCase(type: string, key: string, isOptional = false) {
-  let mongoschema = '';
-  const required = `required:  ${isOptional ? 'false' : 'true'}`;
-
-  switch (type) {
-    case 'string':
-      mongoschema = `${key}: { type: String, ${required} },`;
-      break;
-    case 'number':
-      mongoschema = `${key}: { type: Number, ${required} },`;
-      break;
-    case 'string[]':
-      mongoschema = `${key}: { type: [String], ${required} },`;
-      break;
-    case 'number[]':
-      mongoschema = `${key}: { type: [Number], ${required} },`;
-      break;
-    case 'boolean':
-      mongoschema = `${key}: { type: Boolean, ${required} },`;
-      break;
-    case 'Date':
-      mongoschema = `${key}: { type: Date, ${required} },`;
-      break;
+    return mongoSchema;
   }
-  return mongoschema;
+
+  private mongoSwitchCase(type: string, key: string, isOptional = false) {
+    let mongoSchema = '';
+    const required = `required:  ${isOptional ? 'false' : 'true'}`;
+
+    switch (type) {
+      case 'string':
+        mongoSchema = `${key}: { type: String, ${required} },`;
+        break;
+      case 'number':
+        mongoSchema = `${key}: { type: Number, ${required} },`;
+        break;
+      case 'string[]':
+        mongoSchema = `${key}: { type: [String], ${required} },`;
+        break;
+      case 'number[]':
+        mongoSchema = `${key}: { type: [Number], ${required} },`;
+        break;
+      case 'boolean':
+        mongoSchema = `${key}: { type: Boolean, ${required} },`;
+        break;
+      case 'Date':
+        mongoSchema = `${key}: { type: Date, ${required} },`;
+        break;
+    }
+    return mongoSchema;
+  }
 }

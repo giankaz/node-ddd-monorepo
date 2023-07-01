@@ -1,4 +1,4 @@
-import { CoreError, DefaultUseCase, UseCaseOptions } from '../../../../shared';
+import { DefaultUseCase, UseCaseOptions } from '../../../../shared';
 import {
   XxxxeclixxxxNotFoundErrorFactory,
   XxxxeclixxxxRepositoryInterface,
@@ -29,19 +29,6 @@ export namespace UpdateXxxxeclixxxxUseCase {
 
       if (!xxxxeclixxxx) {
         throw XxxxeclixxxxNotFoundErrorFactory.create(options?.language);
-      }
-
-      const notAllowedFields: Partial<keyof IXxxxeclixxxx>[] = [
-        'id',
-        'status',
-        'created_at',
-        'updated_at',
-      ];
-
-      for (const key in input) {
-        if (!notAllowedFields.includes(key as keyof Input)) {
-          xxxxeclixxxx[key] = input[key];
-        }
       }
 
       return await this.xxxxeclixxxxRepository.update(xxxxeclixxxx);

@@ -22,7 +22,6 @@ describe('Update Xxxxeclixxxx Unity UseCase Test', () => {
     await repository.insertMany([xxxxeclixxxx, xxxxeclixxxx2]);
 
     await useCase.execute({
-      ...xxxxeclixxxx2.toJSON(),
       id: xxxxeclixxxx.id,
     });
 
@@ -30,22 +29,8 @@ describe('Update Xxxxeclixxxx Unity UseCase Test', () => {
 
     const jsonXxxxeclixxxx = foundXxxxeclixxxx.toJSON();
 
-    const notAllowedFields: Partial<keyof typeof jsonXxxxeclixxxx>[] = [
-      'id',
-      'created_at',
-      'updated_at',
-      'status',
-    ];
-
     expect(spyUpdate).toHaveBeenCalledTimes(1);
     expect(jsonXxxxeclixxxx.id).toStrictEqual(xxxxeclixxxx.id);
-    for (const key in jsonXxxxeclixxxx) {
-      if (!notAllowedFields.includes(key as keyof typeof jsonXxxxeclixxxx)) {
-        expect(jsonXxxxeclixxxx[key]).toStrictEqual(
-          xxxxeclixxxx2.toJSON()[key],
-        );
-      }
-    }
   });
 
   it('should throw when not found', async () => {

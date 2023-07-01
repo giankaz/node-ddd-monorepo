@@ -10,12 +10,15 @@ export interface RepositoryInterface<
   findById(id: string): Promise<E>;
   findByField(field: keyof Props, value: unknown): Promise<E>;
   findAll(): Promise<E[]>;
-  search(props: SearchParams<Fields>): Promise<SearchResult<Props, E, Fields>>;
+  search(params: SearchParams<Fields>): Promise<SearchResult<Props, E, Fields>>;
   update(entity: E): Promise<E>;
   delete(id: string): Promise<boolean>;
   activate(id: string): Promise<E>;
-  inactivate(id: string): Promise<E>;
+  deactivate(id: string): Promise<E>;
   softDelete(id: string): Promise<E>;
+  countDocuments(): Promise<number>;
+  getLatest(): Promise<E>;
+  searchWithoutPagination(params: SearchParams<Fields>): Promise<E[]>;
 
   sortableFields: Fields[];
   searchableFields: Fields[];

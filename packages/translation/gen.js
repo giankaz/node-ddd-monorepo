@@ -34,20 +34,21 @@ if (enTranslations.length !== ptTranslations.length) {
   );
 
   throw new Error(
-    `Check if the following translations exists in all tranlation files: ${missingKeys
+    `Check if the following translations exists in all translation files: ${missingKeys
       .join(' - ')
       .trim()}.`,
   );
 }
 
-let tranlationEnum = ``
+let translationEnum = ``
 
 enTranslations.forEach((trans) => {
-  tranlationEnum += `${trans} = '${trans}', \n`
+  translationEnum += `${trans} = '${trans}', \n`
 })
 
 
 const objectsToWrite = `export * from './translate';
+export * from './types';
 import { ITranslations } from './types';
 export type AppLanguages = 'pt' | 'en';
 
@@ -61,7 +62,7 @@ export const languages: ILanguages = {
 };
 
 export enum Translations {
-  ${tranlationEnum}
+  ${translationEnum}
 }
 `;
 

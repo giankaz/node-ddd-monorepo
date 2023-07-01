@@ -1,0 +1,9 @@
+{
+  "example": "exemplo",
+  "the_example": "o exemplo",
+  "not_found_error_message": "%s não encontrado",
+  "not_found_error_solution": "verifique se %s foi criado com sucesso",
+  "status_must_be_active_inactive_deleted": "verifique se o status é ativo, inativo ou deletado",
+  "x_is_required": "%s é obrigatório",
+  "name": "nome"
+}

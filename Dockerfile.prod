@@ -1,0 +1,55 @@
+FROM node:lts-alpine AS builder
+
+RUN npm i -g pnpm
+
+WORKDIR /build
+
+COPY . .
+
+RUN pnpm i
+
+RUN pnpm build
+
+FROM node:lts-alpine AS runner
+
+WORKDIR /app
+
+ARG PKG_TRANSLATION=packages/translation
+
+ARG PKG_CORE=src/core
+
+ARG PKG_APP=src/nestjs
+
+COPY --from=builder /build/node_modules ./node_modules
+
+COPY --from=builder /build/package.json ./package.json
+
+COPY --from=builder /build/${PKG_TRANSLATION}/node_modules ./${PKG_TRANSLATION}/node_modules
+
+COPY --from=builder /build/${PKG_TRANSLATION}/package.json ./${PKG_TRANSLATION}/package.json
+
+COPY --from=builder /build/${PKG_TRANSLATION}/dist ./${PKG_TRANSLATION}/dist
+
+COPY --from=builder /build/${PKG_CORE}/node_modules ./${PKG_CORE}/node_modules
+
+COPY --from=builder /build/${PKG_CORE}/package.json ./${PKG_CORE}/package.json
+
+COPY --from=builder /build/${PKG_CORE}/dist ./${PKG_CORE}/dist
+
+COPY --from=builder /build/${PKG_APP}/node_modules ./${PKG_APP}/node_modules
+
+COPY --from=builder /build/${PKG_APP}/package.json ./${PKG_APP}/package.json
+
+COPY --from=builder /build/${PKG_APP}/dist ./${PKG_APP}/dist
+
+RUN apk add -U dumb-init tzdata
+
+ENV TZ=America/Sao_Paulo
+
+RUN cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+
+EXPOSE 3000
+
+RUN npm i -g pnpm
+
+CMD ["dumb-init", "pnpm", "start:prod"]

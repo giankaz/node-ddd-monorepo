@@ -18,7 +18,7 @@ describe('Create Xxxxeclixxxx Unitary UseCase Test', () => {
 
     const xxxxeclixxxx = RandomXxxxeclixxxxFactory.createOne();
 
-    const output = await useCase.execute(xxxxeclixxxx.props);
+    const output = await useCase.execute(xxxxeclixxxx.toJSON());
 
     const foundXxxxeclixxxx = await repository.findById(xxxxeclixxxx.id);
 

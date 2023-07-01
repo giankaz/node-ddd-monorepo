@@ -1,0 +1,22 @@
+{
+  "name": "translation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "pnpm clean:dist; pnpm clean:tsinfo; pnpm gen; tsc -b tsconfig.json",
+    "gen": "node gen.js; pnpm format",
+    "clean:dist": "rm -rf ./dist",
+    "clean:tsinfo": "rm -rf ./tsconfig.tsbuildinfo",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\" --loglevel silent"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^18.16.3",
+    "json-to-ts": "^1.7.0",
+    "typescript": "^5.0.4"
+  }
+}

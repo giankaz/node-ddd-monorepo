@@ -6,7 +6,7 @@ import {
   CreateXxxxeclixxxxUseCase,
   DeleteXxxxeclixxxxUseCase,
   FindByIdXxxxeclixxxxUseCase,
-  InactivateXxxxeclixxxxUseCase,
+  DeactivateXxxxeclixxxxUseCase,
   ListXxxxeclixxxxsUseCase,
   SoftDeleteXxxxeclixxxxUseCase,
   UpdateXxxxeclixxxxUseCase,
@@ -19,7 +19,7 @@ import {
   CreateXxxxeclixxxxDecorator,
   DeleteXxxxeclixxxxDecorator,
   FindByIdXxxxeclixxxxDecorator,
-  InactivateXxxxeclixxxxDecorator,
+  DeactivateXxxxeclixxxxDecorator,
   ListXxxxeclixxxxsDecorator,
   SoftDeleteXxxxeclixxxxDecorator,
   UpdateXxxxeclixxxxDecorator,
@@ -29,7 +29,7 @@ import {
   XXXXECLIXXXX_ACTIVATED,
   XXXXECLIXXXX_CREATED,
   XXXXECLIXXXX_DELETED,
-  XXXXECLIXXXX_INACTIVATED,
+  XXXXECLIXXXX_DEACTIVATED,
   XXXXECLIXXXX_SOFTDELETED,
   XXXXECLIXXXX_UPDATED,
 } from '../xxxxeclixxxx.constants';
@@ -49,7 +49,7 @@ export class XxxxeclixxxxController {
     private readonly deleteUseCase: DeleteXxxxeclixxxxUseCase.UseCase,
     private readonly softDeleteUseCase: SoftDeleteXxxxeclixxxxUseCase.UseCase,
     private readonly activateUseCase: ActivateXxxxeclixxxxUseCase.UseCase,
-    private readonly inactivateUseCase: InactivateXxxxeclixxxxUseCase.UseCase,
+    private readonly deactivateUseCase: DeactivateXxxxeclixxxxUseCase.UseCase,
   ) {}
 
   @CreateXxxxeclixxxxDecorator()
@@ -144,12 +144,12 @@ export class XxxxeclixxxxController {
     return output;
   }
 
-  @InactivateXxxxeclixxxxDecorator('/inactivate/:id')
-  public async inactivate(
+  @DeactivateXxxxeclixxxxDecorator('/deactivate/:id')
+  public async deactivate(
     @Language() language: AppLanguages,
     @Param('id') id: string,
-  ): Promise<InactivateXxxxeclixxxxUseCase.Output> {
-    const output = await this.inactivateUseCase.execute(
+  ): Promise<DeactivateXxxxeclixxxxUseCase.Output> {
+    const output = await this.deactivateUseCase.execute(
       {
         id,
       },
@@ -158,9 +158,9 @@ export class XxxxeclixxxxController {
       },
     );
 
-    const event = this.inactivateUseCase.eventGenerated;
+    const event = this.deactivateUseCase.eventGenerated;
 
-    this.eventEmitter.emit(XXXXECLIXXXX_INACTIVATED, event);
+    this.eventEmitter.emit(XXXXECLIXXXX_DEACTIVATED, event);
 
     return output;
   }

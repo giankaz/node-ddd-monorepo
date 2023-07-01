@@ -8,7 +8,6 @@ export type CommonEntityValidatorWithMongoId = {
 export const BaseSchemaFields: SchemaDefinition<CommonEntityValidatorWithMongoId> =
   {
     _id: { type: String, alias: 'id' },
-    name: { type: String, required: true },
     status: {
       type: String,
       enum: CommonStatus,

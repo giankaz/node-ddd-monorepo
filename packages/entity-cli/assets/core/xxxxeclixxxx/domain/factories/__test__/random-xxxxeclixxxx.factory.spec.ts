@@ -17,10 +17,10 @@ describe('Random Xxxxeclixxxx Factory Test', (): void => {
 
   it('should create with custom props', async () => {
     const customProps: IPartialXxxxeclixxxx = {
-      name: 'CUSTOM',
+      id: uuid(),
     };
     const entity = RandomXxxxeclixxxxFactory.createOne(customProps);
-    expect(entity.props.name).toStrictEqual(customProps.name);
+    expect(entity.props.id).toStrictEqual(customProps.id);
   });
 
   it('should create multiples', async () => {
@@ -44,12 +44,12 @@ describe('Random Xxxxeclixxxx Factory Test', (): void => {
   it('should create multiples with custom props', async () => {
     const FAKE_ID = uuid();
     const entities = RandomXxxxeclixxxxFactory.createMultiple(10, {
-      name: FAKE_ID,
+      id: FAKE_ID,
     });
 
     entities.forEach((entity) => {
       expect(entity.id).toBeDefined();
-      expect(entity.name).toStrictEqual(FAKE_ID);
+      expect(entity.id).toStrictEqual(FAKE_ID);
     });
 
     expect(entities.length).toBe(10);

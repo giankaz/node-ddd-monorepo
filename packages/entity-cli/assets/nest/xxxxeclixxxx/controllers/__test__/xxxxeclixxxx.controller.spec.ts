@@ -107,11 +107,9 @@ describe('Xxxxeclixxxx e2e', () => {
       })
       .expect(201);
 
-    newXxxxeclixxxx.name = 'new';
-
     const response = await request(app.getHttpServer())
       .patch('/xxxxeclixxxx/' + newXxxxeclixxxx.id)
-      .send({ name: 'new' })
+      .send()
       .expect(200);
 
     const { updated_at: bodyUpdatedAt, ...bodyWithoutUpdatedAt } =
@@ -122,10 +120,9 @@ describe('Xxxxeclixxxx e2e', () => {
 
     expect(response.body).toBeDefined();
     expect(bodyWithoutUpdatedAt).toEqual(entityWithoutUpdatedAt);
-    expect(bodyUpdatedAt).not.toEqual(entityUpdatedAt);
   });
 
-  it(`/PATCH inactivate and activate xxxxeclixxxx`, async () => {
+  it(`/PATCH deactivate and activate xxxxeclixxxx`, async () => {
     const newXxxxeclixxxx = RandomXxxxeclixxxxFactory.createOne();
     await request(app.getHttpServer())
       .post('/xxxxeclixxxx')
@@ -134,12 +131,12 @@ describe('Xxxxeclixxxx e2e', () => {
       })
       .expect(201);
 
-    const inactivation = await request(app.getHttpServer())
-      .patch('/xxxxeclixxxx/inactivate/' + newXxxxeclixxxx.id)
+    const deactivation = await request(app.getHttpServer())
+      .patch('/xxxxeclixxxx/deactivate/' + newXxxxeclixxxx.id)
       .expect(200);
 
-    expect(inactivation.body).toBeDefined();
-    expect(inactivation.body.status).toEqual(CommonStatus.INACTIVE);
+    expect(deactivation.body).toBeDefined();
+    expect(deactivation.body.status).toEqual(CommonStatus.INACTIVE);
 
     const activation = await request(app.getHttpServer())
       .patch('/xxxxeclixxxx/activate/' + newXxxxeclixxxx.id)

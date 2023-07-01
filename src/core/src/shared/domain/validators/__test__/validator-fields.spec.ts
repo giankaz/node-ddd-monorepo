@@ -26,8 +26,10 @@ class StubEntity
   extends Entity<StubEntityValidator>
   implements StubEntityValidator
 {
+  static propsMap: Array<keyof StubEntityValidator> = ['price', 'stub'];
+
   constructor(props: StubEntityValidator) {
-    super(props, StubEntityValidator);
+    super(props, StubEntityValidator, StubEntity.propsMap);
   }
 
   get stub() {

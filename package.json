@@ -1,42 +1,49 @@
 {
   "private": true,
   "scripts": {
-    "build": "turbo run build; pnpm format; pnpm i",
+    "build": "turbo run build",
+    "build:src": "turbo run build:src",
     "dev": "turbo run dev",
     "lint": "turbo run lint -- --max-warnings=0",
     "test": "turbo run test",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\" --loglevel silent",
+    "trans:build": "turbo run translation#build",
     "core:cti": "turbo run core#cti",
     "core:build": "turbo run core#build",
     "core:format": "turbo run core#format",
     "core:test": "turbo run core#test",
+    "core:test:filter": "pnpm --filter=core jest",
     "nest:build": "turbo run nestjs#build",
-    "clear:turbo": "find . -type d -name '.turbo' -print0 | xargs -0 rm -rf",
+    "nest:cti": "pnpm --filter=nestjs cti",
+    "nest:organize": "pnpm --filter=nestjs organize",
+    "nest:test:filter": "pnpm --filter=nest jest",
+    "start:prod": "pnpm --filter=nestjs start:prod",
     "prepare": "husky install",
-    "trans:build": "turbo run translation#build",
-    "g:e": "pnpm ecli gen -p ./src/core/src",
-    "g:e:withnest": "pnpm ecli gen -p ./src/core/src --nest ./src/nestjs/src/modules",
-    "g:e:json": "pnpm ecli gen -p ./src/core/src --json ",
-    "g:e:json:withnest": "pnpm ecli gen -p ./src/core/src --nest ./src/nestjs/src/modules --json ",
-    "ecli:build": "pnpm --filter=entity-cli build; pnpm add -D ./packages/entity-cli -w"
+    "format": "prettier --write \"**/*.{ts,tsx,md}\" --loglevel silent",
+    "clean": "rm -f ./pnpm-lock.yaml; find . -name 'node_modules' -type d -exec rm -rf {} +",
+    "reset": "pnpm clean; pnpm i; turbo run reset; pnpm build; pnpm ecli:build",
+    "clean:turbo": "find . -type d -name '.turbo' -print0 | xargs -0 rm -rf",
+    "ecli:gen": "pnpm ecli gen --core ./src/core/src --nest ./src/nestjs/src/modules",
+    "ecli:add": "pnpm ecli add --core ./src/core/src/$E --nest ./src/nestjs/src/modules/$E",
+    "ecli:build": "pnpm --filter=entity-cli build:cli; pnpm add -D ./packages/entity-cli -w"
   },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "*"
-    }
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "pnpm lint"
+    ]
   },
   "devDependencies": {
-    "@commitlint/cli": "^17.6.1",
-    "@commitlint/config-conventional": "^17.6.1",
-    "@types/jest": "^29.5.1",
+    "@commitlint/cli": "^17.6.6",
+    "@commitlint/config-conventional": "^17.6.6",
+    "@types/jest": "^29.5.2",
     "create-ts-index": "^1.14.0",
     "entity-cli": "link:packages/entity-cli",
-    "eslint": "^7.32.0",
+    "eslint": "^8.32.0",
     "eslint-config-custom": "workspace:*",
+    "git-commit-msg-linter": "^5.0.4",
     "husky": "^8.0.3",
+    "lint-staged": "^13.2.3",
     "listr": "^0.14.3",
-    "prettier": "^2.5.1",
+    "prettier": "^2.8.8",
     "prettier-plugin-organize-imports": "^3.2.2",
     "prompts": "^2.4.2",
     "turbo": "latest"

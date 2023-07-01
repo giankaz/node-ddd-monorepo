@@ -5,5 +5,22 @@
   "not_found_error_solution": "verifique se %s foi criado com sucesso",
   "status_must_be_active_inactive_deleted": "verifique se o status é ativo, inativo ou deletado",
   "x_is_required": "%s é obrigatório",
-  "name": "nome"
+  "name": "nome",
+  "subscription": "assinatura",
+  "plan": "plano",
+  "the_plan": "o plano",
+  "account": "conta",
+  "the_account": "a conta",
+  "benefits": "benefícios",
+  "value": "valor",
+  "version": "versão",
+  "plan_version": "versão do plano",
+  "expires_at": "expira em",
+  "kind": "tipo",
+  "user": "usuário",
+  "the_user": "o usuário",
+  "already_exists_error_message": "%s já existe",
+  "already_exists_error_solution": "verifique se os dados passados estão corretos",
+  "not_accepted_file_type_error_message": "formato de arquivo não suportado, formatos aceitos: %s",
+  "file_not_found": "arquivo não encontrado"
 }

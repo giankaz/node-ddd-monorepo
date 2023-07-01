@@ -4,7 +4,7 @@ import {
   CreateXxxxeclixxxxUseCase,
   DeleteXxxxeclixxxxUseCase,
   FindByIdXxxxeclixxxxUseCase,
-  InactivateXxxxeclixxxxUseCase,
+  DeactivateXxxxeclixxxxUseCase,
   ListXxxxeclixxxxsUseCase,
   SoftDeleteXxxxeclixxxxUseCase,
   UpdateXxxxeclixxxxUseCase,
@@ -80,10 +80,10 @@ export namespace XXXXECLIXXXX_PROVIDER {
       inject: [REPOSITORY.XXXXECLIXXXX_REPOSITORY.provide],
     };
 
-    export const INACTIVATE_XXXXECLIXXXX_USE_CASE = {
-      provide: InactivateXxxxeclixxxxUseCase.UseCase,
+    export const DEACTIVATE_XXXXECLIXXXX_USE_CASE = {
+      provide: DeactivateXxxxeclixxxxUseCase.UseCase,
       useFactory: (repository) => {
-        return new InactivateXxxxeclixxxxUseCase.UseCase(repository);
+        return new DeactivateXxxxeclixxxxUseCase.UseCase(repository);
       },
       inject: [REPOSITORY.XXXXECLIXXXX_REPOSITORY.provide],
     };

@@ -1,9 +1,8 @@
 import { CommonStatus, IXxxxeclixxxx } from 'core';
+import * as vo from './value-objects.dto';
 
 export class XxxxeclixxxxDto implements IXxxxeclixxxx {
   id: string;
-
-  name: string;
 
   status: CommonStatus;
 

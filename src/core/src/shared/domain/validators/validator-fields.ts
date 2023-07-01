@@ -1,4 +1,5 @@
 import { validateSync } from 'class-validator';
+import { debug } from 'console';
 
 export type FieldsErrors = { message: string; context: string };
 
@@ -17,9 +18,11 @@ export class ValidatorFields<PropsValidated>
   validate(data: PropsValidated | null): boolean {
     const errors = validateSync(data as object, {
       stopAtFirstError: true,
+      forbidUnknownValues: false,
     });
 
     if (errors.length) {
+      debug(errors);
       this.errors = { ...this.errors };
       for (const error of errors) {
         const field = error.property;

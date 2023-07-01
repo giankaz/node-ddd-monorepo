@@ -54,6 +54,6 @@ export class FilterInMemory {
       results.push(...result);
     });
 
-    return results;
+    return Array.from(new Set(results));
   }
 }

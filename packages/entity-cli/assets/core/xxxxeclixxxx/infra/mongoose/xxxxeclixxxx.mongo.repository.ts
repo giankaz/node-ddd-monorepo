@@ -1,5 +1,5 @@
 import { Connection } from 'mongoose';
-import { MongooseRepository } from '../../../shared';
+import { EntityClassMapping, MongooseRepository } from '../../../shared';
 import { Xxxxeclixxxx, XxxxeclixxxxRepositoryInterface } from '../../domain';
 import { XxxxeclixxxxSchema } from './xxxxeclixxxx.schema';
 import { IXxxxeclixxxx } from '../../application';
@@ -13,17 +13,15 @@ export class XxxxeclixxxxMongoRepository
   implements XxxxeclixxxxRepositoryInterface.Repository
 {
   sortableFields: XxxxeclixxxxRepositoryInterface.XxxxeclixxxxFields[] = [
-    'name',
     'created_at',
   ];
-  searchableFields: XxxxeclixxxxRepositoryInterface.XxxxeclixxxxFields[] = [
-    'name',
-  ];
+  searchableFields: XxxxeclixxxxRepositoryInterface.XxxxeclixxxxFields[] = [];
   filterableFields: XxxxeclixxxxRepositoryInterface.XxxxeclixxxxFields[] = [
     'id',
-    'name',
     'status',
   ];
+
+  public entityClassMapping: EntityClassMapping[] = [];
 
   constructor(connection?: Connection) {
     super({
@@ -31,17 +29,12 @@ export class XxxxeclixxxxMongoRepository
       modelName: 'Xxxxeclixxxx',
       Schema: XxxxeclixxxxSchema,
       connection,
+      subDocuments: [],
+      populates: [],
     });
   }
 
   public toEntity(model: IXxxxeclixxxx): Xxxxeclixxxx {
-    return new Xxxxeclixxxx({
-      /*toentityprops*/
-      id: model.id,
-      created_at: model.created_at,
-      name: model.name,
-      status: model.status,
-      updated_at: model.updated_at,
-    });
+    return new Xxxxeclixxxx(this.modelParser(model));
   }
 }

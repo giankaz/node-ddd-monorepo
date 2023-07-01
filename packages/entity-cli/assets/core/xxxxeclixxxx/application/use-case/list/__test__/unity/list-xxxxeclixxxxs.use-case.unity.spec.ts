@@ -93,8 +93,6 @@ describe('List Xxxxeclixxxxs Unitary UseCase Test', () => {
       params: {
         page: 1,
         per_page: 10,
-        search: '',
-        filter: [],
         defaultSearch: { id: FAKE_ID },
       },
     });
@@ -116,7 +114,6 @@ describe('List Xxxxeclixxxxs Unitary UseCase Test', () => {
       params: {
         page: 1,
         per_page: 10,
-        filter: [],
         defaultSearch: { id: FAKE_ID },
       },
     });
@@ -150,21 +147,19 @@ describe('List Xxxxeclixxxxs Unitary UseCase Test', () => {
         per_page: 10,
         sort: 'created_at',
         sort_dir: 'asc',
-        search: '',
-        filter: [],
       },
     });
 
-    let atualItemCreatedAt = output.items[0].created_at;
+    let currentItemCreatedAt = output.items[0].created_at;
 
     for (let i = 1; i < output.items.length; i++) {
       expect(
         isBefore(
-          new Date(String(atualItemCreatedAt)),
+          new Date(String(currentItemCreatedAt)),
           new Date(String(output.items[i].created_at)),
         ),
       ).toStrictEqual(true);
-      atualItemCreatedAt = output.items[i].created_at;
+      currentItemCreatedAt = output.items[i].created_at;
     }
 
     const outputDesc = await useCase.execute({
@@ -173,21 +168,19 @@ describe('List Xxxxeclixxxxs Unitary UseCase Test', () => {
         per_page: 10,
         sort: 'created_at',
         sort_dir: 'desc',
-        search: '',
-        filter: [],
       },
     });
 
-    let descAtualItemCreatedAt = outputDesc.items[0].created_at;
+    let descCurrentItemCreatedAt = outputDesc.items[0].created_at;
 
     for (let i = 1; i < outputDesc.items.length; i++) {
       expect(
         isBefore(
           new Date(String(outputDesc.items[i].created_at)),
-          new Date(String(descAtualItemCreatedAt)),
+          new Date(String(descCurrentItemCreatedAt)),
         ),
       ).toStrictEqual(true);
-      descAtualItemCreatedAt = outputDesc.items[i].created_at;
+      descCurrentItemCreatedAt = outputDesc.items[i].created_at;
     }
   });
 
@@ -195,7 +188,7 @@ describe('List Xxxxeclixxxxs Unitary UseCase Test', () => {
     const FAKE_ID = uuid();
 
     const items = RandomXxxxeclixxxxFactory.createMultiple(5, {
-      name: FAKE_ID,
+      id: FAKE_ID,
     });
 
     await repository.insertMany(items);
@@ -206,13 +199,12 @@ describe('List Xxxxeclixxxxs Unitary UseCase Test', () => {
         per_page: 10,
         sort: null,
         search: FAKE_ID,
-        filter: [],
       },
     });
 
     expect(output.total).toStrictEqual(5);
     output.items.forEach((item) => {
-      expect(item.name).toStrictEqual(FAKE_ID);
+      expect(item.id).toStrictEqual(FAKE_ID);
     });
   });
 
@@ -225,11 +217,11 @@ describe('List Xxxxeclixxxxs Unitary UseCase Test', () => {
       }),
       ...RandomXxxxeclixxxxFactory.createMultiple(4, {
         status: CommonStatus.ACTIVE,
-        name: FAKE_ID,
+        id: FAKE_ID,
       }),
       RandomXxxxeclixxxxFactory.createOne({
         status: CommonStatus.DELETED,
-        name: FAKE_ID,
+        id: FAKE_ID,
       }),
     ];
 
@@ -240,7 +232,6 @@ describe('List Xxxxeclixxxxs Unitary UseCase Test', () => {
         page: 1,
         per_page: 10,
         sort: null,
-        search: '',
         filter: [
           {
             column: 'status',
@@ -256,7 +247,7 @@ describe('List Xxxxeclixxxxs Unitary UseCase Test', () => {
       expect(item.status).toStrictEqual(CommonStatus.INACTIVE);
     });
 
-    const outputName = await useCase.execute({
+    const outputId = await useCase.execute({
       params: {
         page: 1,
         per_page: 10,
@@ -264,7 +255,7 @@ describe('List Xxxxeclixxxxs Unitary UseCase Test', () => {
         search: '',
         filter: [
           {
-            column: 'name',
+            column: 'id',
             operator: FilterOperators.CONTAINS,
             type: 'string',
             value: FAKE_ID,
@@ -273,8 +264,8 @@ describe('List Xxxxeclixxxxs Unitary UseCase Test', () => {
       },
     });
 
-    outputName.items.forEach((item) => {
-      expect(item.name).toStrictEqual(FAKE_ID);
+    outputId.items.forEach((item) => {
+      expect(item.id).toStrictEqual(FAKE_ID);
     });
   });
 });

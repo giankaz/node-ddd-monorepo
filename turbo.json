@@ -5,9 +5,12 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**"],
+      "cache": true
+    },
+    "test": {
+      "dependsOn": ["build"],
       "cache": false
     },
-    "test": {},
     "format": {},
     "lint": {},
     "clear:turbo": {},
@@ -22,9 +25,19 @@
     },
     "core#cti": {},
     "core#build": {
-      "dependsOn": ["translation#build"]
+      "dependsOn": ["translation#build"],
+      "cache": false
     },
     "core#format": {},
-    "core#test": {}
+    "core#test": {},
+    "reset": {
+      "cache": false
+    },
+    "nestjs#build:src": {
+      "dependsOn": ["core#build:src"]
+    },
+    "build:src": {
+      "cache": false
+    }
   }
 }

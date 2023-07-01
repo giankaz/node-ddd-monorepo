@@ -6,9 +6,13 @@ export class Xxxxeclixxxx
   extends Entity<XxxxeclixxxxValidator>
   implements XxxxeclixxxxValidator
 {
+  static propsMap: Array<keyof XxxxeclixxxxValidator> = [
+    /*propsmap*/
+  ];
+
   constructor(props: XxxxeclixxxxValidator) {
     /*entitypresuper*/
-    super(props, XxxxeclixxxxValidator);
+    super(props, XxxxeclixxxxValidator, Xxxxeclixxxx.propsMap);
   }
 
   /*getters*/

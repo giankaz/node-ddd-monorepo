@@ -5,7 +5,7 @@ import {
   CreateXxxxeclixxxxUseCase,
   DeleteXxxxeclixxxxUseCase,
   Event,
-  InactivateXxxxeclixxxxUseCase,
+  DeactivateXxxxeclixxxxUseCase,
   SoftDeleteXxxxeclixxxxUseCase,
   UpdateXxxxeclixxxxUseCase,
 } from 'core';
@@ -13,7 +13,7 @@ import {
   XXXXECLIXXXX_ACTIVATED,
   XXXXECLIXXXX_CREATED,
   XXXXECLIXXXX_DELETED,
-  XXXXECLIXXXX_INACTIVATED,
+  XXXXECLIXXXX_DEACTIVATED,
   XXXXECLIXXXX_SOFTDELETED,
   XXXXECLIXXXX_UPDATED,
 } from '../xxxxeclixxxx.constants';
@@ -34,11 +34,11 @@ export class XxxxeclixxxxEventListeners {
     // do something after xxxxeclixxxx is activated
   }
 
-  @OnEvent(XXXXECLIXXXX_INACTIVATED, { async: true })
-  async xxxxeclixxxxInactivatedEvent(
-    payload: Event<InactivateXxxxeclixxxxUseCase.Output>,
+  @OnEvent(XXXXECLIXXXX_DEACTIVATED, { async: true })
+  async xxxxeclixxxxDeactivatedEvent(
+    payload: Event<DeactivateXxxxeclixxxxUseCase.Output>,
   ) {
-    // do something after xxxxeclixxxx is inactivated
+    // do something after xxxxeclixxxx is deactivated
   }
 
   @OnEvent(XXXXECLIXXXX_UPDATED, { async: true })

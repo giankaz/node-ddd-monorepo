@@ -77,7 +77,7 @@ describe('Parse Filter Operator Tests', () => {
     const test = ParseFilterOperatorsInMemory.parse(params);
     expect(
       test.toString().split('return')[1].replace('}', '').trim(),
-    ).toStrictEqual('item.name === teste');
+    ).toStrictEqual(`String(item.name) === 'teste'`);
   });
 
   it('should be successful returning the expected function for operator: NOT_EQUAL.', () => {
@@ -90,7 +90,7 @@ describe('Parse Filter Operator Tests', () => {
     const test = ParseFilterOperatorsInMemory.parse(params);
     expect(
       test.toString().split('return')[1].replace('}', '').trim(),
-    ).toStrictEqual('item.name !== teste');
+    ).toStrictEqual(`String(item.name) !== 'teste'`);
   });
 
   it('should be successful returning the expected function for operator: HAD.', () => {

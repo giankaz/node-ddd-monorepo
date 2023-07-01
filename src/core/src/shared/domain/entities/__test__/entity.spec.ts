@@ -21,8 +21,10 @@ class StubEntityValidator extends CommonEntityValidator {
 }
 
 class StubEntity extends Entity<StubEntityValidator> {
+  static propsMap: Array<keyof StubEntityValidator> = ['price', 'stub'];
+
   constructor(props: StubEntityValidator) {
-    super(props, StubEntityValidator);
+    super(props, StubEntityValidator, StubEntity.propsMap);
   }
 }
 
@@ -55,7 +57,6 @@ describe('Entity Test', () => {
     const mockDate = new Date('2000-10-10');
     const mockCommon: CommonEntityValidator = {
       id: fake_id,
-      name: 'name',
       status: CommonStatus.INACTIVE,
       created_at: mockDate,
       updated_at: mockDate,

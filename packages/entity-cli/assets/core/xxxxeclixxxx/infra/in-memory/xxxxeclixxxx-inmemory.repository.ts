@@ -11,15 +11,11 @@ export class XxxxeclixxxxInMemoryRepository
   implements XxxxeclixxxxRepositoryInterface.Repository
 {
   sortableFields: XxxxeclixxxxRepositoryInterface.XxxxeclixxxxFields[] = [
-    'name',
     'created_at',
   ];
-  searchableFields: XxxxeclixxxxRepositoryInterface.XxxxeclixxxxFields[] = [
-    'name',
-  ];
+  searchableFields: XxxxeclixxxxRepositoryInterface.XxxxeclixxxxFields[] = [];
   filterableFields: XxxxeclixxxxRepositoryInterface.XxxxeclixxxxFields[] = [
     'id',
-    'name',
     'status',
   ];
 }

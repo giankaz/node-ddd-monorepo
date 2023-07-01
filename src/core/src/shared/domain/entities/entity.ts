@@ -21,16 +21,29 @@ export abstract class Entity<Validator extends CommonEntityValidator> {
      * @param {Validator}
      */
     private readonly ClassValidator: { new (props: Validator): Validator },
+    /**
+     * The properties that this entity will receive, others properties
+     * will be ignored
+     * @param {Array<keyof Pick<Validator, keyof Validator>>}
+     */
+    private readonly propsMap: Array<keyof Pick<Validator, keyof Validator>>,
   ) {
     this.uniqueEntityId = props?.id
       ? new UniqueEntityId(props.id)
       : new UniqueEntityId();
 
+    this.propsMap = [...propsMap, 'id', 'status', 'created_at', 'updated_at'];
+
+    for (const key in props) {
+      if (!this.propsMap.includes(key)) {
+        Reflect.deleteProperty(props, key);
+      }
+    }
+
     this.props = {
       ...props,
       created_at: props?.created_at ? new Date(props.created_at) : new Date(),
       id: this.uniqueEntityId.value,
-      name: props?.name,
       status: props?.status || CommonStatus.ACTIVE,
       updated_at: props?.updated_at ? new Date(props.updated_at) : null,
     };
@@ -40,15 +53,6 @@ export abstract class Entity<Validator extends CommonEntityValidator> {
 
   get id(): string {
     return this.uniqueEntityId.value;
-  }
-
-  get name(): string {
-    return this.props.name;
-  }
-
-  set name(newName: string) {
-    this.props.name = newName;
-    this.update();
   }
 
   get status(): CommonStatus {
@@ -93,7 +97,7 @@ export abstract class Entity<Validator extends CommonEntityValidator> {
     this.update();
   }
 
-  public inactivate() {
+  public deactivate() {
     this.props.status = CommonStatus.INACTIVE;
     this.update();
   }
@@ -107,13 +111,19 @@ export abstract class Entity<Validator extends CommonEntityValidator> {
   toJSON(): Required<CommonEntityValidator & Validator> {
     const data = {};
     for (const key of Object.keys(this.props || {})) {
-      if (this.props[key] instanceof ValueObject) {
+      if (
+        this.props[key] instanceof ValueObject ||
+        this.props[key] instanceof Entity
+      ) {
         data[key] = this.props[key].toJSON();
       } else if (
         Array.isArray(this.props[key]) &&
-        this.props[key].every((prop) => prop instanceof ValueObject)
+        (this.props[key].every((prop) => prop instanceof ValueObject) ||
+          this.props[key].every((prop) => prop instanceof Entity))
       ) {
-        data[key] = this.props[key].map((prop) => prop.toJSON());
+        data[key] = this.props[key].map((prop) => {
+          return prop.toJSON();
+        });
       } else {
         data[key] = this.props[key];
       }

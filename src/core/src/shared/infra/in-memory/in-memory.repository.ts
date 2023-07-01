@@ -75,7 +75,9 @@ export abstract class InMemoryRepository<
       : [];
 
     return FilterInMemory.parse<Props, E, Fields>(items, filter, {
-      searchableFields: this.searchableFields,
+      searchableFields: Array.from(
+        new Set([...this.filterableFields, ...this.searchableFields]),
+      ),
       defaultSearch,
     });
   }
@@ -165,13 +167,13 @@ export abstract class InMemoryRepository<
     return entity;
   }
 
-  async inactivate(id: string): Promise<E> {
+  async deactivate(id: string): Promise<E> {
     const _id = `${id}`;
     const entity = await this._get(_id);
     if (!entity) {
       return;
     }
-    entity.inactivate();
+    entity.deactivate();
     return entity;
   }
 
@@ -183,6 +185,19 @@ export abstract class InMemoryRepository<
     }
     entity.softDelete();
     return entity;
+  }
+
+  async countDocuments(): Promise<number> {
+    return this.items.length;
+  }
+
+  async getLatest(): Promise<E> {
+    return this.items[this.items.length - 1];
+  }
+
+  async searchWithoutPagination(params: SearchParams<Fields>): Promise<E[]> {
+    const itemsFiltered = await this.applyFilter(this.items, params);
+    return itemsFiltered;
   }
 
   protected async _get(id: string): Promise<E> {

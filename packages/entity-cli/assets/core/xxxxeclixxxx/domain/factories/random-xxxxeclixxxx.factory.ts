@@ -6,7 +6,6 @@ import { CommonStatus } from '../../../shared';
 export class RandomXxxxeclixxxxFactory {
   public static createOne(props?: IPartialXxxxeclixxxx): Xxxxeclixxxx {
     const xxxxeclixxxx: IXxxxeclixxxx = {
-      name: `RANDOM-${uuid()}`,
       created_at: new Date(),
       id: uuid(),
       status: CommonStatus.ACTIVE,

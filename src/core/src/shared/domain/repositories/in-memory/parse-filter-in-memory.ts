@@ -60,14 +60,14 @@ export class ParseFilterOperatorsInMemory {
   static parseEqual<Fields extends string>(param: FilterParams<Fields>) {
     return new Function(
       'item',
-      `return item.${[param.column]} === ${param.value}`,
+      `return String(item.${[param.column]}) === '${param.value}'`,
     );
   }
 
   static parseNotEqual<Fields extends string>(param: FilterParams<Fields>) {
     return new Function(
       'item',
-      `return item.${[param.column]} !== ${param.value}`,
+      `return String(item.${[param.column]}) !== '${param.value}'`,
     );
   }
 

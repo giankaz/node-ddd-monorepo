@@ -1,5 +1,5 @@
 import { IsDate, IsEnum, IsOptional, IsString } from 'class-validator';
-import { Translations } from 'translation';
+import { Translations } from '../../../../../../packages/translation_v1/dist';
 
 export enum CommonStatus {
   ACTIVE = 'ACTIVE',
@@ -11,12 +11,6 @@ export class CommonEntityValidator {
   @IsString()
   @IsOptional()
   id?: string;
-
-  @IsString({
-    message: Translations.x_is_required,
-  })
-  @IsOptional()
-  name?: string;
 
   @IsEnum(CommonStatus, {
     message: Translations.status_must_be_active_inactive_deleted,
@@ -33,10 +27,14 @@ export class CommonEntityValidator {
   updated_at?: Date | null;
 
   constructor(props: CommonEntityValidator) {
+    const commonProps: CommonEntityValidator = {};
+
     for (const key in props) {
       if (key in CommonEntityValidator) {
-        Object.assign(this, props);
+        commonProps[key] = props[key];
       }
     }
+
+    Object.assign(this, commonProps);
   }
 }

@@ -80,11 +80,9 @@ describe('List Xxxxeclixxxxs Integration UseCase Test', () => {
 
     const sameIdItems = [
       RandomXxxxeclixxxxFactory.createOne({
-        name: FAKE_ID,
+        id: FAKE_ID,
       }),
-      RandomXxxxeclixxxxFactory.createOne({
-        name: FAKE_ID,
-      }),
+      RandomXxxxeclixxxxFactory.createOne(),
     ];
 
     await repository.insertMany([...items, ...sameIdItems]);
@@ -93,22 +91,18 @@ describe('List Xxxxeclixxxxs Integration UseCase Test', () => {
       params: {
         page: 1,
         per_page: 10,
-        search: '',
-        filter: [],
-        defaultSearch: { name: FAKE_ID },
+        defaultSearch: { id: FAKE_ID },
       },
     });
 
     output.items.forEach((item) => {
-      expect(item.name).toStrictEqual(FAKE_ID);
+      expect(item.id).toStrictEqual(FAKE_ID);
     });
   });
 
   it('should work the page and per_page methods', async () => {
     const FAKE_ID = uuid();
-    const items = RandomXxxxeclixxxxFactory.createMultiple(21, {
-      name: FAKE_ID,
-    });
+    const items = RandomXxxxeclixxxxFactory.createMultiple(21);
 
     await repository.insertMany(items);
 
@@ -116,12 +110,7 @@ describe('List Xxxxeclixxxxs Integration UseCase Test', () => {
       params: {
         page: 1,
         per_page: 10,
-        filter: [],
-        defaultSearch: { name: FAKE_ID },
       },
-    });
-    output.items.forEach((item) => {
-      expect(item.name).toStrictEqual(FAKE_ID);
     });
 
     expect(output.last_page).toStrictEqual(3);
@@ -150,21 +139,19 @@ describe('List Xxxxeclixxxxs Integration UseCase Test', () => {
         per_page: 10,
         sort: 'created_at',
         sort_dir: 'asc',
-        search: '',
-        filter: [],
       },
     });
 
-    let atualItemCreatedAt = output.items[0].created_at;
+    let currentItemCreatedAt = output.items[0].created_at;
 
     for (let i = 1; i < output.items.length; i++) {
       expect(
         isBefore(
-          new Date(String(atualItemCreatedAt)),
+          new Date(String(currentItemCreatedAt)),
           new Date(String(output.items[i].created_at)),
         ),
       ).toStrictEqual(true);
-      atualItemCreatedAt = output.items[i].created_at;
+      currentItemCreatedAt = output.items[i].created_at;
     }
 
     const outputDesc = await useCase.execute({
@@ -173,50 +160,23 @@ describe('List Xxxxeclixxxxs Integration UseCase Test', () => {
         per_page: 10,
         sort: 'created_at',
         sort_dir: 'desc',
-        search: '',
-        filter: [],
       },
     });
 
-    let descAtualItemCreatedAt = outputDesc.items[0].created_at;
+    let descCurrentItemCreatedAt = outputDesc.items[0].created_at;
 
     for (let i = 1; i < outputDesc.items.length; i++) {
       expect(
         isBefore(
           new Date(String(outputDesc.items[i].created_at)),
-          new Date(String(descAtualItemCreatedAt)),
+          new Date(String(descCurrentItemCreatedAt)),
         ),
       ).toStrictEqual(true);
-      descAtualItemCreatedAt = outputDesc.items[i].created_at;
+      descCurrentItemCreatedAt = outputDesc.items[i].created_at;
     }
   });
 
-  it('should work the search method', async () => {
-    const FAKE_ID = uuid();
-
-    const items = RandomXxxxeclixxxxFactory.createMultiple(5, {
-      name: FAKE_ID,
-    });
-
-    await repository.insertMany(items);
-
-    const output = await useCase.execute({
-      params: {
-        page: 1,
-        per_page: 10,
-        sort: null,
-        search: FAKE_ID,
-        filter: [],
-      },
-    });
-
-    expect(output.total).toStrictEqual(5);
-    output.items.forEach((item) => {
-      expect(item.name).toStrictEqual(FAKE_ID);
-    });
-  });
-
-  it('should work the filter method', async () => {
+  it('should work with the filter method', async () => {
     const FAKE_ID = uuid();
 
     const items = [
@@ -225,11 +185,10 @@ describe('List Xxxxeclixxxxs Integration UseCase Test', () => {
       }),
       ...RandomXxxxeclixxxxFactory.createMultiple(4, {
         status: CommonStatus.ACTIVE,
-        name: FAKE_ID,
       }),
       RandomXxxxeclixxxxFactory.createOne({
         status: CommonStatus.DELETED,
-        name: FAKE_ID,
+        id: FAKE_ID,
       }),
     ];
 
@@ -240,7 +199,6 @@ describe('List Xxxxeclixxxxs Integration UseCase Test', () => {
         page: 1,
         per_page: 10,
         sort: null,
-        search: '',
         filter: [
           {
             column: 'status',
@@ -256,7 +214,7 @@ describe('List Xxxxeclixxxxs Integration UseCase Test', () => {
       expect(item.status).toStrictEqual(CommonStatus.INACTIVE);
     });
 
-    const outputName = await useCase.execute({
+    const outputId = await useCase.execute({
       params: {
         page: 1,
         per_page: 10,
@@ -264,7 +222,7 @@ describe('List Xxxxeclixxxxs Integration UseCase Test', () => {
         search: '',
         filter: [
           {
-            column: 'name',
+            column: 'id',
             operator: FilterOperators.CONTAINS,
             type: 'string',
             value: FAKE_ID,
@@ -273,8 +231,8 @@ describe('List Xxxxeclixxxxs Integration UseCase Test', () => {
       },
     });
 
-    outputName.items.forEach((item) => {
-      expect(item.name).toStrictEqual(FAKE_ID);
+    outputId.items.forEach((item) => {
+      expect(item.id).toStrictEqual(FAKE_ID);
     });
   });
 });
