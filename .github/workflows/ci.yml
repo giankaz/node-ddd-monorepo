@@ -1,9 +1,9 @@
 on:
   push:
     branches:
-      - dev
+      - main
 
-name: Main Workflow
+name: Build and Test
 jobs:
   ci:
     runs-on: ubuntu-latest
